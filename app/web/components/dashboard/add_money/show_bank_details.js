@@ -6,22 +6,14 @@ import { withStyles } from 'material-ui/styles';
 import List, {
 	ListItem,
 	ListItemText,
-	ListItemAvatar,
 	ListItemSecondaryAction
 } from 'material-ui/List';
 import Grid from 'material-ui/Grid';
 import Hidden from 'material-ui/Hidden';
 import TextField from 'material-ui/TextField';
 import Button from 'material-ui/Button';
-import green from 'material-ui/colors/green';
-import Avatar from 'material-ui/Avatar';
 import Divider from 'material-ui/Divider';
-import Payment from 'material-ui-icons/Payment';
 import { CircularProgress } from 'material-ui/Progress';
-import Biz from 'material-ui-icons/BusinessCenter';
-import CheckIcon from 'material-ui-icons/Check';
-import AddIcon from 'material-ui-icons/Add';
-import classNames from 'classnames';
 import Paper from 'material-ui/Paper';
 import Color from 'color';
 import Typography from 'material-ui/Typography';

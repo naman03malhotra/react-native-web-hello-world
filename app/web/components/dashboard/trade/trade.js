@@ -10,7 +10,7 @@ import Grid from 'material-ui/Grid';
 import SvgIcon from 'material-ui/SvgIcon';
 import TrendingUp from 'material-ui-icons/TrendingUp';
 import TrendingDown from 'material-ui-icons/TrendingDown';
-
+import { CircularProgress } from 'material-ui/Progress';
 import AppTheme from '../../../../theme/variables';
 import BuyBid from './bid';
 import SellBid from './ask';
@@ -18,7 +18,18 @@ import SellBid from './ask';
 import ActiveBids from './active_bids';
 import ActiveOrders from './active_orders';
 
-const styles = theme => ({});
+const styles = theme => ({
+	fabProgress: {
+		color: AppTheme.colorPrimary,
+		position: 'relative',
+		top: 'calc(50% - 100px)',
+		left: 'calc(50% - 100px)',
+		zIndex: 1
+	},
+	gridContainer: {
+		height: '100%'
+	}
+});
 
 const BTCIcon = props => (
 	<SvgIcon {...props}>
@@ -44,38 +55,54 @@ TabContainer.propTypes = {
 
 class Dashboard extends Component {
 	state = {
-		value: 0,
-		cryptoGridValue: 0
+		index: 0,
+		cryptoGridValue: 0,
+		isReady: false
 	};
 
 	static propTypes = {
 		classes: PropTypes.object.isRequired
 	};
 
-	handleChange = (event, value) => {
-		this.setState({ value });
+	componentWillMount() {
+		const { loadTitle, title } = this.props;
+		loadTitle(title);
+	}
+	componentDidMount() {
+		this.setState({
+			isReady: false
+		});
+	}
+
+	_handleChange = (event, index) => {
+		if (index > 1) return;
+		this.setState({ index });
 	};
 
-	handleChangeIndex = index => {
-		this.setState({ value: index });
+	_handleChangeSwipe = index => {
+		if (index > 1) return;
+		this.setState({ index });
 	};
 
-	cryptoHandleChange = (event, value) => {
-		this.setState({ cryptoGridValue: value });
+	_cryptoHandleChange = (event, index) => {
+		if (index > 1) return;
+		this.setState({ cryptoGridValue: index });
 	};
 
-	cryptoHandleChangeIndex = index => {
+	_cryptoHandleChangeSwipe = index => {
+		if (index > 1) return;
 		this.setState({ cryptoGridValue: index });
 	};
 
 	_returnBTCGrid() {
+		const { index } = this.state;
 		return (
 			<Grid container spacing={24}>
 				<Grid item xs={12} sm={6}>
 					<AppBar position="static" color="default">
 						<Tabs
-							value={this.state.value}
-							onChange={this.handleChange}
+							value={index}
+							onChange={this._handleChange}
 							indicatorColor={AppTheme.colorPrimary}
 							textColor={AppTheme.colorPrimary}
 							fullWidth
@@ -85,10 +112,7 @@ class Dashboard extends Component {
 							<Tab label="Place Sell Bid" icon={<TrendingDown />} />
 						</Tabs>
 					</AppBar>
-					<SwipeableViews
-						index={this.state.value}
-						onChangeIndex={this.handleChangeIndex}
-					>
+					<SwipeableViews index={index} onChangeIndex={this._handleChangeSwipe}>
 						<TabContainer>
 							<BuyBid />
 						</TabContainer>
@@ -100,8 +124,8 @@ class Dashboard extends Component {
 				<Grid item xs={12} sm={6}>
 					<AppBar position="static" color="default">
 						<Tabs
-							value={this.state.value}
-							onChange={this.handleChange}
+							value={index}
+							onChange={this._handleChange}
 							indicatorColor={AppTheme.colorPrimary}
 							textColor={AppTheme.colorPrimary}
 							fullWidth
@@ -111,10 +135,7 @@ class Dashboard extends Component {
 							<Tab label="Buy Orders" icon={<TrendingUp />} />
 						</Tabs>
 					</AppBar>
-					<SwipeableViews
-						index={this.state.value}
-						onChangeIndex={this.handleChangeIndex}
-					>
+					<SwipeableViews index={index} onChangeIndex={this._handleChangeSwipe}>
 						<TabContainer>
 							<ActiveBids />
 						</TabContainer>
@@ -131,31 +152,35 @@ class Dashboard extends Component {
 	}
 	render() {
 		const { classes } = this.props;
-
+		const { cryptoGridValue, isReady } = this.state;
 		return (
-			<Grid container spacing={24}>
-				<Grid item xs={12} sm={12}>
-					<AppBar position="static" color="default">
-						<Tabs
-							value={this.state.cryptoGridValue}
-							onChange={this.cryptoHandleChange}
-							indicatorColor={AppTheme.colorPrimary}
-							textColor={AppTheme.colorPrimary}
-							fullWidth
-							centered
+			<Grid container spacing={24} className={classes.gridContainer}>
+				{!isReady ? (
+					<CircularProgress className={classes.fabProgress} size={200} />
+				) : (
+					<Grid item xs={12} sm={12}>
+						<AppBar position="static" color="default">
+							<Tabs
+								value={cryptoGridValue}
+								onChange={this._cryptoHandleChange}
+								indicatorColor={AppTheme.colorPrimary}
+								textColor={AppTheme.colorPrimary}
+								fullWidth
+								centered
+							>
+								<Tab label="BTC" icon={<BTCIcon />} />
+								<Tab label="ETH" icon={<ETHIcon />} />
+							</Tabs>
+						</AppBar>
+						<SwipeableViews
+							index={cryptoGridValue}
+							onChangeIndex={this._cryptoHandleChangeSwipe}
 						>
-							<Tab label="BTC" icon={<BTCIcon />} />
-							<Tab label="ETH" icon={<ETHIcon />} />
-						</Tabs>
-					</AppBar>
-					<SwipeableViews
-						index={this.state.cryptoGridValue}
-						onChangeIndex={this.cryptoHandleChangeIndex}
-					>
-						<TabContainer>{this._returnBTCGrid()}</TabContainer>
-						<TabContainer>{this._returnBTCGrid()}</TabContainer>
-					</SwipeableViews>
-				</Grid>
+							<TabContainer>{this._returnBTCGrid()}</TabContainer>
+							<TabContainer>{this._returnBTCGrid()}</TabContainer>
+						</SwipeableViews>
+					</Grid>
+				)}
 			</Grid>
 		);
 	}

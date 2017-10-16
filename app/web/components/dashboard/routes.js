@@ -13,6 +13,7 @@ import Withdraw from 'material-ui-icons/FileDownload';
 
 import Passbook from 'material-ui-icons/History';
 import Settings from 'material-ui-icons/Settings';
+import ArrowBack from 'material-ui-icons/ArrowBack';
 
 import { Link } from 'react-router-dom';
 
@@ -99,5 +100,13 @@ export const settings = (
 				<ListItemText primary="Settings" />
 			</ListItem>
 		</Link>
+		<a href="/" style={styles}>
+			<ListItem button>
+				<ListItemIcon>
+					<ArrowBack />
+				</ListItemIcon>
+				<ListItemText primary="Logout" />
+			</ListItem>
+		</a>
 	</div>
 );

@@ -15,6 +15,7 @@ import Divider from 'material-ui/Divider';
 import AccountBalance from 'material-ui-icons/AccountBalance';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import SwipeableViews from 'react-swipeable-views';
+import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 import SvgIcon from 'material-ui/SvgIcon';
 
@@ -43,6 +44,9 @@ const styles = theme => ({
 		paddingTop: AppTheme.spacingUnit * 4,
 		paddingBottom: AppTheme.spacingUnit * 4
 	},
+	listSecondaryItem: {
+		textAlign: 'right'
+	},
 	icon: {
 		backgroundColor: AppTheme.colorPrimary
 	}
@@ -68,14 +72,18 @@ function generate(element) {
 
 class BalanceDashboard extends Component {
 	static propTypes = {
-		classes: PropTypes.object.isRequired
+		classes: PropTypes.object.isRequired,
+		cryptoRate: PropTypes.object.isRequired,
+		userData: PropTypes.object.isRequired
 	};
 	state = {
 		value: 0
 	};
 
 	render() {
-		const { classes } = this.props;
+		const { classes, userData, cryptoRate } = this.props;
+		const totalBTC = (userData.btc.balanceReal + userData.btc.balanceVirtual
+		).toFixed(2);
 
 		return (
 			<Grid container spacing={24}>
@@ -93,8 +101,8 @@ class BalanceDashboard extends Component {
 					</AppBar>
 					<SwipeableViews index={this.state.value}>
 						<TabContainer>
-							<List className={classes.list}>
-								<ListItem>
+							<List>
+								<ListItem className={classes.list}>
 									<ListItemAvatar>
 										<Avatar className={classes.icon}>
 											<BTCIcon />
@@ -102,13 +110,17 @@ class BalanceDashboard extends Component {
 									</ListItemAvatar>
 									<ListItemText primary="Bitcoin" />
 									<ListItemSecondaryAction>
-										<ListItemText primary="0.0000" secondary={'₹ 0.00'} />
+										<ListItemText
+											primary={`${totalBTC} BTC`}
+											secondary={`${(totalBTC * cryptoRate.btc.sell).toFixed(
+												2
+											)} INR`}
+											className={classes.listSecondaryItem}
+										/>
 									</ListItemSecondaryAction>
 								</ListItem>
-							</List>
-							<Divider />
-							<List className={classes.list}>
-								<ListItem>
+								<Divider />
+								<ListItem className={classes.list}>
 									<ListItemAvatar>
 										<Avatar className={classes.icon}>
 											<ETHIcon />
@@ -116,13 +128,15 @@ class BalanceDashboard extends Component {
 									</ListItemAvatar>
 									<ListItemText primary="Etherium" />
 									<ListItemSecondaryAction>
-										<ListItemText primary="0.0000" secondary={'₹ 0.00'} />
+										<ListItemText
+											className={classes.listSecondaryItem}
+											primary="0.0000"
+											secondary={'₹ 0.00'}
+										/>
 									</ListItemSecondaryAction>
 								</ListItem>
-							</List>
-							<Divider />
-							<List className={classes.list}>
-								<ListItem>
+								<Divider />
+								<ListItem className={classes.list}>
 									<ListItemAvatar>
 										<Avatar className={classes.icon}>
 											<INRIcon />
@@ -130,8 +144,20 @@ class BalanceDashboard extends Component {
 									</ListItemAvatar>
 									<ListItemText primary="Indian Rupee" />
 									<ListItemSecondaryAction>
-										<ListItemText primary="0.0000" secondary={'₹ 0.00'} />
+										<ListItemText
+											className={classes.listSecondaryItem}
+											primary={userData.balanceFiat.toFixed(2)}
+											secondary={userData.countryCode}
+										/>
 									</ListItemSecondaryAction>
+								</ListItem>
+								<Divider />
+								<ListItem>
+									<Typography type="caption" className={classes.listSecondaryItem}>
+										{`${(userData.balanceFiat / cryptoRate.btc.buy).toFixed(
+											2
+										)} BTC can be bought with your current balance`}
+									</Typography>
 								</ListItem>
 							</List>
 						</TabContainer>

@@ -8,12 +8,24 @@ import Grid from 'material-ui/Grid';
 import Button from 'material-ui/Button';
 import ArrowUpward from 'material-ui-icons/ArrowUpward';
 import Color from 'color';
+import classNames from 'classnames';
+import Input, { InputLabel } from 'material-ui/Input';
+import { FormControl, FormHelperText } from 'material-ui/Form';
 import AppTheme from '../../../../theme/variables';
+import CustomTextInput from '../../common/text_input';
 
 const styles = theme => ({
 	textField: {
 		margin: AppTheme.spacingUnit,
 		fontSize: AppTheme.spacingUnit * 3
+	},
+	colorPrimary: {
+		color: AppTheme.colorPrimary
+	},
+	inputField: {
+		'&:after': {
+			backgroundColor: AppTheme.colorPrimary
+		}
 	},
 	gridStyle: {
 		textAlign: 'center'
@@ -39,24 +51,33 @@ class InstantBuy extends Component {
 	static propTypes = {
 		classes: PropTypes.object.isRequired
 	};
+	state = {
+		value: '300000'
+	}
+	_manageAmountBuy = (text, type) => {
+		console.log(text, type);
+		this.setState({
+			value: text
+		})
+	};
 	render() {
-		const { classes } = this.props;
+		const { classes, crypto, fiat } = this.props;
 		return (
 			<Grid container spacing={24}>
 				<Grid item xs={6} className={classes.gridStyle}>
 					<TextField
-						label="BTC"
+						label={crypto}
 						defaultValue="1"
 						className={classes.textField}
 						helperText="Some important text"
 					/>
 				</Grid>
 				<Grid item xs={6} className={classes.gridStyle}>
-					<TextField
-						label="INR"
-						defaultValue="300000"
-						className={classes.textField}
+					<CustomTextInput
+						label={fiat}
+						value={this.state.value}
 						helperText="Some important text"
+						onChange={event => this._manageAmountBuy(event.currentTarget.value, fiat)}
 					/>
 				</Grid>
 				<Grid item xs={12} className={classes.gridStyle}>

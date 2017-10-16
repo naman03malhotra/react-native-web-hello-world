@@ -15,7 +15,6 @@ import InstantSell from './instant_sell';
 
 import BalanceDashboard from './balance_dashboard';
 
-
 const styles = theme => ({});
 
 const BTCIcon = props => (
@@ -41,32 +40,40 @@ TabContainer.propTypes = {
 };
 
 class Dashboard extends Component {
-	state = {
-		value: 0
-	};
-
 	static propTypes = {
-		classes: PropTypes.object.isRequired
+		classes: PropTypes.object.isRequired,
+		cryptoRate: PropTypes.object.isRequired,
+		userData: PropTypes.object.isRequired,
+		access_token: PropTypes.string.isRequired,
+		title: PropTypes.string.isRequired,		
+		history: PropTypes.object.isRequired,		
+		location: PropTypes.object
 	};
-
-	handleChange = (event, value) => {
-		this.setState({ value });
+	state = {
+		index: 0
 	};
-
-	handleChangeIndex = index => {
-		this.setState({ value: index });
+	componentWillMount() {
+		const { loadTitle, title } = this.props;
+		loadTitle(title);
+	}
+	_handleChange = (event, index) => {
+		this.setState({ index });
+	};
+	_handleChangeSwipe = index => {
+		this.setState({ index });
 	};
 
 	render() {
-		const { classes } = this.props;
-
+		// console.log(this.props);
+		const { index } = this.state;
+		const { userData, cryptoRate } = this.props;
 		return (
 			<Grid container spacing={24}>
 				<Grid item xs={12} sm={6}>
 					<AppBar position="static" color="default">
 						<Tabs
-							value={this.state.value}
-							onChange={this.handleChange}
+							value={index}
+							onChange={this._handleChange}
 							indicatorColor={AppTheme.colorPrimary}
 							textColor={AppTheme.colorPrimary}
 							fullWidth
@@ -76,19 +83,19 @@ class Dashboard extends Component {
 							<Tab label="ETH" icon={<ETHIcon />} />
 						</Tabs>
 					</AppBar>
-					<SwipeableViews
-						index={this.state.value}
-						onChangeIndex={this.handleChangeIndex}
-					>
+					<SwipeableViews index={index} onChangeIndex={this._handleChangeSwipe}>
 						<TabContainer>
-							<InstantBuy />
-							<InstantSell />
+							<InstantBuy crypto="BTC" fiat="INR" />
+							<InstantSell crypto="BTC" fiat="INR" />
 						</TabContainer>
-						<TabContainer>{'Item Two'}</TabContainer>
+						<TabContainer>
+							<InstantBuy crypto="ETH" fiat="INR" />
+							<InstantSell crypto="ETH" fiat="INR" />
+						</TabContainer>
 					</SwipeableViews>
 				</Grid>
 				<Grid item xs={12} sm={6}>
-					<BalanceDashboard />
+					<BalanceDashboard userData={userData} cryptoRate={cryptoRate} />
 				</Grid>
 			</Grid>
 		);

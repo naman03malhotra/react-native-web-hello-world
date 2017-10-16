@@ -25,9 +25,7 @@ const styles = theme => ({
 		width: '100%',
 		height: '100%',
 		zIndex: 1,
-		overflow: 'hidden',
-		fontFamily:
-			'"Avenir Next", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif'
+		overflow: 'hidden'
 	},
 	appFrame: {
 		position: 'relative',
@@ -130,11 +128,13 @@ class Main extends Component {
 	};
 
 	render() {
-		const { classes } = this.props;
+		const { classes, title } = this.props;
 		const drawer = (
 			<div onClick={this.handleDrawerToggle}>
 				<div className={classNames(classes.drawerHeader, classes.colorPrimary)}>
-					<Typography type="headline" className={classes.drawerTitle}>Alconomy</Typography>
+					<Typography type="headline" className={classes.drawerTitle}>
+						Alconomy
+					</Typography>
 				</div>
 				<List className={classes.list}>{incomingTransactions}</List>
 				<Divider />
@@ -158,7 +158,7 @@ class Main extends Component {
 								<MenuIcon />
 							</IconButton>
 							<Typography type="title" color="inherit" noWrap>
-								Dashboard
+								{title}
 							</Typography>
 						</Toolbar>
 					</AppBar>

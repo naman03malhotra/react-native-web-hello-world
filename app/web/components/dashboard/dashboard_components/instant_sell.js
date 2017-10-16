@@ -40,12 +40,12 @@ class InstantSell extends Component {
 		classes: PropTypes.object.isRequired
 	};
 	render() {
-		const { classes } = this.props;
+		const { classes, crypto, fiat } = this.props;		
 		return (
 			<Grid container spacing={24}>
 				<Grid item xs={6} className={classes.gridStyle}>
 					<TextField
-						label="BTC"
+						label={crypto}
 						defaultValue="1"
 						className={classes.textField}
 						helperText="Some important text"
@@ -53,7 +53,7 @@ class InstantSell extends Component {
 				</Grid>
 				<Grid item xs={6} className={classes.gridStyle}>
 					<TextField
-						label="INR"
+						label={fiat}
 						defaultValue="290000"
 						className={classes.textField}
 						helperText="Some important text"

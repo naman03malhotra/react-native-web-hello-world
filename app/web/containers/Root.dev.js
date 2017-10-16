@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Provider }             from 'react-redux';
-import ReactNativeWebHelloWorld from './App';
+import App from './App';
 import DevTools                 from './DevTools';
 
 export default class Root extends Component {
@@ -14,7 +14,7 @@ export default class Root extends Component {
     return (
       <Provider store={this.props.store}>
         <div>
-          <ReactNativeWebHelloWorld />
+          <App />
           {/* <DevTools /> */}
         </div>
       </Provider>

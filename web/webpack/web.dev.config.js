@@ -9,7 +9,7 @@ module.exports = {
 		path.join(__dirname, '../../app/web/index')
 	],
 	output: {
-		path: path.join(__dirname, '../public'),
+		path: path.join(__dirname, '../public/builds'),
 		filename: 'bundle.js',
 		publicPath: '/'
 	},
@@ -27,9 +27,13 @@ module.exports = {
 			},
 			{
 				test: /\.js$/,
-				exclude: /node_modules/,
+				include: [
+					path.resolve(__dirname, '../../app/web'),
+					path.resolve(__dirname, '../../node_modules/react-native-storage')	
+				],
 				loader: 'babel-loader',
 				query: {
+					cacheDirectory: true,					
 					presets: ['es2015', 'react', 'stage-0'],
 					plugins: [
 						[
@@ -44,7 +48,8 @@ module.exports = {
 									}
 								]
 							}
-						]
+						],
+						'transform-runtime'
 					]
 				}
 			}
