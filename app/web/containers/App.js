@@ -64,11 +64,15 @@ class App extends Component {
 	render() {
 		const { title, isReady } = this.state;
 		const { app, classes } = this.props;
-
+		// console.log(this.props);
 		return (
 			<div className="react-native-web">
 				{!isReady ? (
-					<CircularProgress className={classes.fabProgress} size={200} />
+					<CircularProgress
+						className={classes.fabProgress}
+						size={200}
+						thickness={0.5}
+					/>
 				) : (
 					<Router>
 						<Route>

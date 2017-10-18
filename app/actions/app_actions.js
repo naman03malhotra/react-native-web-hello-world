@@ -1,5 +1,5 @@
 import ACTION from '../constants/constants';
-import { API, COUNTRY_CODE, CLIENT } from '../configs/app_config';
+import { API } from '../configs/app_config';
 import APIManager from '../utils/APIManager';
 import Store from '../utils/storage';
 
@@ -61,12 +61,12 @@ const appLoadActions = {
 						data: rateData
 					});
 				})
-				.catch(err => {
-					dispatch({
-						type: ACTION.APP.APP_ERROR,
-						data: err
-					});
-				});
+				// .catch(err => {
+				// 	dispatch({
+				// 		type: ACTION.APP.APP_ERROR,
+				// 		data: err
+				// 	});
+				// });
 		};
 	}
 };

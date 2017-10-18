@@ -11,6 +11,7 @@ import Color from 'color';
 import classNames from 'classnames';
 import Input, { InputLabel } from 'material-ui/Input';
 import { FormControl, FormHelperText } from 'material-ui/Form';
+import { CircularProgress } from 'material-ui/Progress';
 import AppTheme from '../../../../theme/variables';
 import CustomTextInput from '../../common/text_input';
 
@@ -42,49 +43,118 @@ const styles = theme => ({
 				.hex()
 		}
 	},
+	fabProgress: {
+		color: AppTheme.colorWhite
+	},
 	icon: {
 		marginLeft: AppTheme.spacingUnit
 	}
 });
 
+const mode = {
+	FIAT: 'fiat',
+	CRYPTO: 'crypto'
+};
+
 class InstantBuy extends Component {
 	static propTypes = {
-		classes: PropTypes.object.isRequired
+		classes: PropTypes.object.isRequired,
+		dashboard: PropTypes.object.isRequired,
+		dashboardActions: PropTypes.object.isRequired,
+		cryptoRate: PropTypes.object.isRequired,
+		userData: PropTypes.object.isRequired,
+		access_token: PropTypes.string.isRequired,
+		type: PropTypes.string.isRequired
 	};
 	state = {
-		value: '300000'
+		cryptoAmt: 1,
+		fiatAmt: 0,
+		loading: false,
+		cryptoError: { message: null },
+		fiatError: { message: null }
+	};
+
+	componentDidMount() {
+		const { crypto, type, cryptoRate, fiat } = this.props;
+		const { cryptoAmt } = this.state;
+		const fiatAmtFinal = (cryptoAmt * cryptoRate[crypto][type]).toFixed(2);
+		const cryptoError = { message: `Min amt is 0.001 ${crypto.toUpperCase()}` };
+		const fiatError = { message: `Min amt is 1000 ${fiat.toUpperCase()}` };
+		this.setState({ fiatAmt: fiatAmtFinal, cryptoError, fiatError });
+		this._manageAmount(cryptoAmt, mode.CRYPTO);
 	}
-	_manageAmountBuy = (text, type) => {
-		console.log(text, type);
-		this.setState({
-			value: text
-		})
+	componentWillReceiveProps(props) {
+		const { crypto, dashboard, type } = props;
+		const { inputData } = dashboard.manageAmount;
+
+		if (inputData !== null) {
+			try {
+				const cryptoAmt = inputData[crypto][type][mode.CRYPTO].amt;
+				this.setState({ cryptoAmt });
+			} catch (err) {}
+			try {
+				const fiatAmt = inputData[crypto][type][mode.FIAT].amt;
+				this.setState({ fiatAmt });
+			} catch (err) {}
+			try {
+				const loading = inputData[crypto][type].loading;
+				this.setState({ loading });
+			} catch (err) {}
+		}
+	}
+	_manageAmount = (text, mode) => {
+		const {
+			dashboardActions,
+			access_token,
+			cryptoRate,
+			crypto,
+			type
+		} = this.props;
+		dashboardActions.manageAmount(
+			text,
+			mode,
+			type,
+			access_token,
+			cryptoRate,
+			crypto
+		);
 	};
 	render() {
-		const { classes, crypto, fiat } = this.props;
+		const { cryptoAmt, fiatAmt, loading, cryptoError, fiatError } = this.state;
+		const { classes, fiat, type, crypto } = this.props;
 		return (
 			<Grid container spacing={24}>
 				<Grid item xs={6} className={classes.gridStyle}>
-					<TextField
+					<CustomTextInput
 						label={crypto}
-						defaultValue="1"
-						className={classes.textField}
-						helperText="Some important text"
+						type="number"
+						value={cryptoAmt}
+						helperText={cryptoError.message}
+						onChange={event =>
+							this._manageAmount(event.currentTarget.value, mode.CRYPTO)}
 					/>
 				</Grid>
 				<Grid item xs={6} className={classes.gridStyle}>
 					<CustomTextInput
 						label={fiat}
-						value={this.state.value}
-						helperText="Some important text"
-						onChange={event => this._manageAmountBuy(event.currentTarget.value, fiat)}
+						type="number"
+						value={fiatAmt}
+						helperText={fiatError.message}
+						onChange={event =>
+							this._manageAmount(event.currentTarget.value, mode.FIAT)}
 					/>
 				</Grid>
 				<Grid item xs={12} className={classes.gridStyle}>
-					<Button raised color="primary" className={classes.button}>
-						INSTANT BUY
-						<ArrowUpward className={classes.icon} />
-					</Button>
+					{!loading ? (
+						<Button raised color="primary" className={classes.button}>
+							{`INSTANT ${type.toUpperCase()}`}
+							<ArrowUpward className={classes.icon} />
+						</Button>
+					) : (
+						<Button raised className={classes.button}>
+							<CircularProgress size={24} className={classes.fabProgress} />
+						</Button>
+					)}
 				</Grid>
 			</Grid>
 		);

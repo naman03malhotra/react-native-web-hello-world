@@ -2,7 +2,10 @@ import { combineReducers } from 'redux';
 // import assign from 'object-assign';
 import ACTION from '../constants/constants';
 
-const signUpAccount = (state = { open: false, loadingOtp: false }, action) => {
+const signUpAccount = (
+	state = { open: false, loadingOtp: false, error: null },
+	action
+) => {
 	switch (action.type) {
 		case ACTION.SIGNUP.SIGNUP_ACCOUNT:
 			return Object.assign({}, state, action.data);
@@ -11,6 +14,8 @@ const signUpAccount = (state = { open: false, loadingOtp: false }, action) => {
 		case ACTION.SIGNUP.LOADING_OTP:
 			return Object.assign({}, state, action.data);
 		case ACTION.SIGNUP.SIGNUP_ACCOUNT_ERR:
+			return Object.assign({}, state, action.data);
+		case ACTION.SIGNUP.SIGNUP_ACCOUNT_VALIDATION_ERR:
 			return Object.assign({}, state, action.data);
 	}
 	return state;
@@ -33,8 +38,8 @@ const signUpMobileInput = (state = { mobile: '' }, action) => {
 };
 
 const signUpForm = combineReducers({
-  signUpAccount,
-  signInAccount,
+	signUpAccount,
+	signInAccount,
 	signUpMobileInput
 });
 

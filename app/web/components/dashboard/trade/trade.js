@@ -156,7 +156,11 @@ class Dashboard extends Component {
 		return (
 			<Grid container spacing={24} className={classes.gridContainer}>
 				{!isReady ? (
-					<CircularProgress className={classes.fabProgress} size={200} />
+					<CircularProgress
+						className={classes.fabProgress}
+						size={200}
+						thickness={0.5}
+					/>
 				) : (
 					<Grid item xs={12} sm={12}>
 						<AppBar position="static" color="default">

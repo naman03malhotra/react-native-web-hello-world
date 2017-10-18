@@ -15,12 +15,14 @@ const API = {
 	getSellersBid: `http://${serverIp}/api/bid/seller/get`,
 	getActiveOrders: `http://${serverIp}/api/bid/history`,
 	cancelBuyerBid: `http://${serverIp}/api/bid/buyer/cancel`,
-	cancelSellerBid: `http://${serverIp}/api/bid/seller/cancel`,	
+	cancelSellerBid: `http://${serverIp}/api/bid/seller/cancel`,
 	//instant buy / Dashboard
-	getInstantBuyingPrice: `http://${serverIp}/api/bid/getInstantBuyingPrice`,
-	getInstantSellingPrice: `http://${serverIp}/api/bid/getInstantSellingPrice`,
+	getInstantPrice: {
+		buy: `http://${serverIp}/api/bid/getInstantBuyingPrice`,
+		sell: `http://${serverIp}/api/bid/getInstantSellingPrice`	
+	},
 	instantBuy: `http://${serverIp}/api/bid/instantBuy`,
-	instantSell: `http://${serverIp}/api/bid/instantSell`,	
+	instantSell: `http://${serverIp}/api/bid/instantSell`,
 	//deposit
 	createDeposit: `http://${serverIp}/api/deposit/create`,
 	cancelDeposit: `http://${serverIp}/api/deposit/cancel`,
@@ -52,4 +54,23 @@ const CLIENT = {
 	client_secret: 'donttell'
 };
 
-export { API, COUNTRY_CODE, CLIENT };
+const ERRORS = {
+	SIGNUP: {
+		MOBILE_LENGTH: {
+			title: 'Invalid Mobile Number',
+			message: 'Mobile number length should be 10 digits'
+		}
+	},
+	DASHBOARD: {
+		NEGATIVE_NUMBER: {
+			title: 'Nagative Amount',
+			message: 'Please input a positive amount'
+		},
+		INVALID_NUMBER: {
+			title: 'Invalid Number',
+			message: 'Please input a valid number'
+		}
+	}
+};
+
+export { API, COUNTRY_CODE, CLIENT, ERRORS };

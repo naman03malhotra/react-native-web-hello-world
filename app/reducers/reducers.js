@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux';
 import appLoad from './app_reducer';
 import signUpForm from './signup_form_reducer';
+import dashboard from './dashboard_reducer';
 
 const combineReducer = combineReducers({
   appLoad,
-  signUpForm
+  signUpForm,
+  dashboard
 });
 
 const appReducer = combineReducers({

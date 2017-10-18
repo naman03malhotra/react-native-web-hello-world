@@ -9,10 +9,13 @@ import { FormControl, FormHelperText } from 'material-ui/Form';
 const styles = theme => ({
 	textField: {
 		margin: AppTheme.spacingUnit,
-		fontSize: AppTheme.spacingUnit * 3
+		fontSize: AppTheme.spacingUnit * 2.5
 	},
 	colorPrimary: {
 		color: AppTheme.colorPrimary
+	},
+	captialize: {
+		textTransform: 'uppercase'
 	},
 	inputField: {
 		'&:after': {
@@ -25,7 +28,7 @@ class CustomTextInput extends Component {
 	static propTypes = {
 		classes: PropTypes.object.isRequired,
 		label: PropTypes.string.isRequired,
-		helperText: PropTypes.string.isRequired,
+		helperText: PropTypes.string,
 		error: PropTypes.bool
 	};
 	static defaultProps = {
@@ -42,7 +45,8 @@ class CustomTextInput extends Component {
 				<InputLabel
 					className={classNames({
 						[classes.colorPrimary]: !error && focused
-					})}
+					},
+					classes.captialize)}
 				>
 					{label}
 				</InputLabel>

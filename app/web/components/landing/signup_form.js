@@ -79,26 +79,13 @@ class SignupForm extends Component {
 	_toggleLoading = () => {
 		this.setState({ loading: !this.state.loading });
 	};
-	_validateData = signup => {
-		if (signup.signUpMobileInput.mobile.length !== 10) {
-			const title = 'Invalid Mobile Number';
-			const message = 'Mobile number length should be 10 digits';
-			this.setState({
-				error: {
-					title,
-					message
-				}
-			});
-			return false;
-		}
-		return true;
-	};
+
 	_processSignin = () => {
 		const { signup, signUpActions } = this.props;
 		signUpActions.signIn(signup.signUpMobileInput).then(() => {
 			const { signup, signUpActions } = this.props;
 			if (signup.signInAccount.access_token != '') {
-				// signUpActions.loadingOtp(false);
+				signUpActions.loadingOtp(false);
 				// this._sendFirebaseToken(signup.signInAccount.access_token);
 				window.location = '/dashboard';
 			}
@@ -106,7 +93,7 @@ class SignupForm extends Component {
 	};
 	_enterDashboard = otp => {
 		const { signup, signUpActions } = this.props;
-		let dataToSend = assign({}, signup.signUpMobileInput, otp);
+		const dataToSend = assign({}, signup.signUpMobileInput, otp);
 		if (!signup.signUpAccount.loadingOtp) {
 			signUpActions.loadingOtp(true);
 			signUpActions.signUp(dataToSend).then(() => {
@@ -125,7 +112,12 @@ class SignupForm extends Component {
 	_handleFormSubmit = event => {
 		event.preventDefault();
 		const { signup, signUpActions } = this.props;
-		if (!this._validateData(signup)) return;
+
+		const { error } = signUpActions.validateData(signup.signUpMobileInput).data;
+		if (error !== null) {
+			this.setState({ error });
+			return;
+		}
 		if (!this.state.loading) {
 			this._toggleLoading();
 			signUpActions.signUp(signup.signUpMobileInput).then(() => {
@@ -136,7 +128,7 @@ class SignupForm extends Component {
 				} else {
 					const title = 'Error Occured';
 					const message = `Please contact us, error: ${signUpAccount
-						.errors[0]}`;
+						.errors[0].errors.mobile.message}`;
 					this.setState({
 						error: {
 							title,
@@ -154,7 +146,7 @@ class SignupForm extends Component {
 		const { loading, error, otpError } = this.state;
 		const { classes, signUpActions, signup } = this.props;
 		const openError = error !== null ? true : false;
-		console.log(this.props);
+		// console.log(this.props);
 		return (
 			<Grid container spacing={24}>
 				<Hidden xsDown>

@@ -4,7 +4,7 @@
 */
 import Request from 'superagent';
 
-const responseTime = 30000;
+const responseTime = 15000;
 const APIManager = {
 	getData: (url, params, header) => {
 		return new Promise((resolve, reject) => {

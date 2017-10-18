@@ -3,16 +3,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import SwipeableViews from 'react-swipeable-views';
 import Grid from 'material-ui/Grid';
 import SvgIcon from 'material-ui/SvgIcon';
-
+import dashboardActions from '../../../../actions/dashboard_actions';
 import AppTheme from '../../../../theme/variables';
 import InstantBuy from './instant_buy';
 import InstantSell from './instant_sell';
-
 import BalanceDashboard from './balance_dashboard';
 
 const styles = theme => ({});
@@ -42,11 +43,13 @@ TabContainer.propTypes = {
 class Dashboard extends Component {
 	static propTypes = {
 		classes: PropTypes.object.isRequired,
+		dashboard: PropTypes.object.isRequired,
+		dashboardActions: PropTypes.object.isRequired,
 		cryptoRate: PropTypes.object.isRequired,
 		userData: PropTypes.object.isRequired,
 		access_token: PropTypes.string.isRequired,
-		title: PropTypes.string.isRequired,		
-		history: PropTypes.object.isRequired,		
+		title: PropTypes.string.isRequired,
+		history: PropTypes.object.isRequired,
 		location: PropTypes.object
 	};
 	state = {
@@ -64,9 +67,15 @@ class Dashboard extends Component {
 	};
 
 	render() {
-		// console.log(this.props);
+		console.log(this.props);
 		const { index } = this.state;
-		const { userData, cryptoRate } = this.props;
+		const {
+			userData,
+			cryptoRate,
+			dashboard,
+			dashboardActions,
+			access_token
+		} = this.props;
 		return (
 			<Grid container spacing={24}>
 				<Grid item xs={12} sm={6}>
@@ -85,12 +94,48 @@ class Dashboard extends Component {
 					</AppBar>
 					<SwipeableViews index={index} onChangeIndex={this._handleChangeSwipe}>
 						<TabContainer>
-							<InstantBuy crypto="BTC" fiat="INR" />
-							<InstantSell crypto="BTC" fiat="INR" />
+							<InstantBuy
+								userData={userData}
+								cryptoRate={cryptoRate}
+								dashboard={dashboard}
+								dashboardActions={dashboardActions}
+								access_token={access_token}
+								crypto="btc"
+								fiat="inr"
+								type="buy"
+							/>
+							<InstantBuy
+								userData={userData}
+								cryptoRate={cryptoRate}
+								dashboard={dashboard}
+								dashboardActions={dashboardActions}
+								access_token={access_token}
+								crypto="btc"
+								fiat="inr"
+								type="sell"
+							/>
 						</TabContainer>
 						<TabContainer>
-							<InstantBuy crypto="ETH" fiat="INR" />
-							<InstantSell crypto="ETH" fiat="INR" />
+							<InstantBuy
+								userData={userData}
+								cryptoRate={cryptoRate}
+								dashboard={dashboard}
+								dashboardActions={dashboardActions}
+								access_token={access_token}
+								crypto="btc"
+								fiat="inr"
+								type="buy"
+							/>
+							<InstantBuy
+								userData={userData}
+								cryptoRate={cryptoRate}
+								dashboard={dashboard}
+								dashboardActions={dashboardActions}
+								access_token={access_token}
+								crypto="btc"
+								fiat="inr"
+								type="sell"
+							/>
 						</TabContainer>
 					</SwipeableViews>
 				</Grid>
@@ -101,4 +146,19 @@ class Dashboard extends Component {
 		);
 	}
 }
-export default withStyles(styles)(Dashboard);
+
+function mapStateToProps(state) {
+	return {
+		dashboard: state.app.dashboard
+	};
+}
+
+function mapDispatchToProps(dispatch) {
+	return {
+		dashboardActions: bindActionCreators(dashboardActions, dispatch)
+	};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+	withStyles(styles)(Dashboard)
+);

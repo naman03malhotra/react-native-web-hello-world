@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-// import assign from 'object-assign';
+import { HandleCatch } from '../utils/helpers';
 import ACTION from '../constants/constants';
 
 const initialLoad = (state = { access_token: null }, action) => {
@@ -35,6 +35,7 @@ const appError = (state = null, action) => {
 				text: action.data,
 				json: JSON.parse(JSON.stringify(action.data))
 			};
+			HandleCatch(action.data);
 			return Object.assign({}, state, error);
 	}
 	return state;
