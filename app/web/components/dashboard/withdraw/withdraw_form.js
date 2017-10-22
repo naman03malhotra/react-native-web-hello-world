@@ -138,24 +138,30 @@ class WithdrawForm extends Component {
 					this._handleErrorRequestClose();
 					this._toggleModal();
 				};
+			} else if (error.code === 1) {
+				error.closeButtonText = 'Cancel';
+				error.mainButtonText = 'Confirm';
+				error.func = () => {
+					this._handleErrorRequestClose();
+					this._executeWithdraw(withdraw.amountInput);
+				};
 			}
 			this.setState({ error });
-			return;
 		}
-		error = withdrawActions.confirmPrompt(withdraw.amountInput, fiat).data
-			.error;
-		if (error.code === 1) {
-			error.closeButtonText = 'Cancel';
-			error.mainButtonText = 'Confirm';
-			error.func = () => {
-				this._handleErrorRequestClose();
-				this._initiateDeposit(withdraw.amountInput);
-			};
-			this.setState({ error });			
-		}
+		// error = withdrawActions.confirmPrompt(withdraw.amountInput, fiat).data
+		// 	.error;
+		// if (error.code === 1) {
+		// 	error.closeButtonText = 'Cancel';
+		// 	error.mainButtonText = 'Confirm';
+		// 	error.func = () => {
+		// 		this._handleErrorRequestClose();
+		// 		this._executeWithdraw(withdraw.amountInput);
+		// 	};
+		// 	this.setState({ error });			
+		// }
 	};
 
-	_initiateDeposit = data => {
+	_executeWithdraw = data => {
 		const { withdraw, withdrawActions, access_token, history } = this.props;
 		withdrawActions
 			.initiateDeposit(withdraw.amountInput, access_token)

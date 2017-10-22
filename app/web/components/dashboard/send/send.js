@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import AppBar from 'material-ui/AppBar';
 import { withStyles } from 'material-ui/styles';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { CircularProgress } from 'material-ui/Progress';
 import green from 'material-ui/colors/green';
 import Button from 'material-ui/Button';
@@ -17,7 +19,7 @@ import SwipeableViews from 'react-swipeable-views';
 import Grid from 'material-ui/Grid';
 import TextField from 'material-ui/TextField';
 import Color from 'color';
-
+import sendActions from '../../../../actions/send_action';
 import AppTheme from '../../../../theme/variables';
 
 import SendINR from './send_inr';
@@ -105,6 +107,15 @@ function TabContainer(props) {
 	);
 }
 class Send extends Component {
+	static propTypes = {
+		classes: PropTypes.object.isRequired,
+		userData: PropTypes.object.isRequired,
+		access_token: PropTypes.string.isRequired,
+		title: PropTypes.string.isRequired,
+		loadTitle: PropTypes.func.isRequired,
+		history: PropTypes.object.isRequired,
+		location: PropTypes.object
+	};
 	state = {
 		indexValue: 0
 	};
@@ -147,7 +158,7 @@ class Send extends Component {
 							onChangeIndex={this._handleChangeSwipe}
 						>
 							<TabContainer>
-								<SendINR {...all} mode="fiat" />
+								<SendINR {...all} mode="fiat" crypto={fiat} />
 							</TabContainer>
 							<TabContainer>
 								<SendINR {...all} mode="crypto" crypto="btc" />
@@ -163,8 +174,18 @@ class Send extends Component {
 	}
 }
 
-Send.propTypes = {
-	classes: PropTypes.object.isRequired
-};
+function mapStateToProps(state) {
+	return {
+		send: state.app.send
+	};
+}
 
-export default withStyles(styles)(Send);
+function mapDispatchToProps(dispatch) {
+	return {
+		sendActions: bindActionCreators(sendActions, dispatch)
+	};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+	withStyles(styles)(Send)
+);

@@ -16,8 +16,9 @@ import SwipeableViews from 'react-swipeable-views';
 import Grid from 'material-ui/Grid';
 import TextField from 'material-ui/TextField';
 import Color from 'color';
-
+import CustomTextInput from '../../common/text_input';
 import AppTheme from '../../../../theme/variables';
+import SimpleAlert from '../../../components/common/simple_alert';
 
 const styles = theme => ({
 	root: {
@@ -90,50 +91,144 @@ function TabContainer(props) {
 		<div style={{ padding: AppTheme.spaceExtraBig }}>{props.children}</div>
 	);
 }
+const field = {
+	ADDRESS: 'address',
+	AMOUNT: 'amount',
+	DESCP: 'descp'
+};
 class SendINR extends Component {
 	state = {
 		loading: false,
-		success: false,
-		value: 0
+		address: '',
+		amount: '',
+		descp: '',
+		status: 0
 	};
+	componentWillReceiveProps(props) {
+		const { mode, crypto, fiat, send } = props;
+		const { inputData } = send.amountInput;
 
-	componentWillUnmount() {
-		clearTimeout(this.timer);
+		if (inputData !== null) {
+			try {
+				const address = inputData[crypto][mode][field.ADDRESS].value;
+				this.setState({ address });
+			} catch (err) {}
+			try {
+				const amount = inputData[crypto][mode][field.AMOUNT].value;
+				this.setState({ amount });
+			} catch (err) {}
+			try {
+				const descp = inputData[crypto][mode][field.DESCP].value;
+				this.setState({ descp });
+			} catch (err) {}
+			try {
+				const loading = inputData[crypto].loading;
+				this.setState({ loading });
+			} catch (err) {}
+			try {
+				const status = inputData[crypto].status;
+				this.setState({ status });
+			} catch (err) {}
+		}
 	}
-	handleChange = (event, value) => {
-		this.setState({ value });
-	};
-
-	handleRequestClose = () => {
-		this.setState({ success: false });
-	};
-
-	handleButtonClick = () => {
-		if (!this.state.loading) {
-			this.setState(
-				{
-					success: false,
-					loading: true
-				},
-				() => {
-					this.timer = setTimeout(() => {
-						this.setState({
-							loading: false,
-							success: true
-						});
-					}, 1000);
-				}
-			);
+	_initiateSend = () => {
+		const { address, amount, descp } = this.state;
+		const {
+			send,
+			sendActions,
+			userData,
+			fiat,
+			crypto,
+			mode,
+			history
+		} = this.props;
+		const data = {
+			amount,
+			to: address,
+			narration: descp
+		};
+		const { error } = sendActions.validateData(
+			userData,
+			data,
+			crypto,
+			fiat,
+			mode
+		).data;
+		if (error !== null) {
+			if (error.code === 0) {
+				error.closeButtonText = 'Close';
+				error.mainButtonText = 'Add Money';
+				error.func = () => {
+					history.push('/add-money');
+				};
+			} else if (error.code === 10) {
+				error.closeButtonText = 'Close';
+				error.mainButtonText = `Add ${crypto.toUpperCase()}`;
+				error.func = () => {
+					history.push('/receive');
+				};
+			} else if (error.code === 1) {
+				error.closeButtonText = 'Cancel';
+				error.mainButtonText = 'Confirm';
+				error.func = () => {
+					this._handleErrorRequestClose();
+					this._executeSend(data);
+				};
+			}
+			this.setState({ error });
 		}
 	};
-
-	timer = undefined;
-
+	_executeSend = data => {
+		const {
+			send,
+			sendActions,
+			userData,
+			access_token,
+			fiat,
+			crypto,
+			mode,
+			history
+		} = this.props;
+		sendActions.executeSend(data, access_token, crypto, fiat, mode).then(() => {
+			const { error } = this.props.send.amountInput;
+			const { status } = this.state;
+			if (status === 1) {
+				error.closeButtonText = 'close';
+				error.mainButtonText = 'Check Passbook';
+				error.func = () => {
+					history.push('/passbook');
+				};
+			}
+			this.setState({ error });
+		});
+	};
+	_handleErrorRequestClose = () => {
+		this.setState({ error: null });
+	};
 	render() {
-		const { loading, success } = this.state;
-		const { classes, mode, userData, crypto, fiat } = this.props;
+		const { address, amount, descp, loading, error } = this.state;
+		const {
+			classes,
+			mode,
+			userData,
+			crypto,
+			fiat,
+			send,
+			sendActions
+		} = this.props;
 		return (
 			<div>
+				{error && (
+					<SimpleAlert
+						open
+						title={error.title}
+						message={error.message}
+						close={this._handleErrorRequestClose}
+						mainButtonFunc={error.func}
+						closeButtonText={error.closeButtonText}
+						mainButtonText={error.mainButtonText}
+					/>
+				)}
 				<div className={classes.balanceContainer}>
 					<Typography type="subheading">Your Balance</Typography>
 					<Typography type="title" className={classes.title}>
@@ -146,32 +241,61 @@ class SendINR extends Component {
 					</Typography>
 				</div>
 				<TextField
-					label="Sender's Mobile Number"
+					label={`Sender's Mobile Number ${mode === 'crypto'
+						? `or ${crypto.toUpperCase()} address`
+						: ''}`}
 					className={classes.textField}
-					helperText="Some important text"
+					type={mode === 'fiat' ? 'text' : 'text'}
+					value={address}
+					onChange={event =>
+						sendActions.amountInput(
+							event.currentTarget.value,
+							mode,
+							fiat,
+							crypto,
+							field.ADDRESS
+						)}
 				/>
 				<TextField
 					label="Enter Amount"
 					className={classes.textField}
-					helperText="Some important text"
+					type="number"
+					value={amount}
+					onChange={event =>
+						sendActions.amountInput(
+							event.currentTarget.value,
+							mode,
+							fiat,
+							crypto,
+							field.AMOUNT
+						)}
 				/>
 				<TextField
 					label="Optional Description"
-					className={classes.textField}
 					helperText="Some important text"
+					className={classes.textField}
+					value={descp}
+					onChange={event =>
+						sendActions.amountInput(
+							event.currentTarget.value,
+							mode,
+							fiat,
+							crypto,
+							field.DESCP
+						)}
 				/>
 				<div>
 					{!loading ? (
 						<Button
 							raised
 							className={classes.button}
-							onClick={this.handleButtonClick}
+							onClick={this._initiateSend}
 						>
 							Proceed
 							<SendIcon className={classes.icon} />
 						</Button>
 					) : (
-						<Button raised disabled={loading} className={classes.button}>
+						<Button raised disabled className={classes.button}>
 							<CircularProgress size={24} className={classes.fabProgress} />
 						</Button>
 					)}

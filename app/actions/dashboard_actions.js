@@ -146,7 +146,7 @@ const dashboardActions = {
 	executeInstant: (data, access_token, crypto, fiat, type) => {
 		const header = `Bearer ${access_token}`;
 		const api = API.instant[type];
-		let newData = {};
+		const newData = {};
 		newData.inputData = {
 			[crypto]: {
 				[type]: {

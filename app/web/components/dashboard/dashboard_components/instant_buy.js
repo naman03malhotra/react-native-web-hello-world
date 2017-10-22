@@ -133,7 +133,7 @@ class InstantBuy extends Component {
 			crypto
 		);
 	};
-	_executeInstant = () => {
+	_initiateInstant = () => {
 		const { cryptoAmt, fiatAmt, rate } = this.state;
 		const {
 			userData,
@@ -174,14 +174,13 @@ class InstantBuy extends Component {
 				error.mainButtonText = 'Confirm';
 				error.func = () => {
 					this._handleErrorRequestClose();
-					this._executeInstantFinal(data);
+					this._executeInstant(data);
 				};
 			}
 			this.setState({ error });
-			return;
 		}
 	};
-	_executeInstantFinal = data => {
+	_executeInstant = data => {
 		const {
 			dashboardActions,
 			crypto,
@@ -257,7 +256,7 @@ class InstantBuy extends Component {
 							raised
 							color="primary"
 							className={classes.button}
-							onClick={this._executeInstant}
+							onClick={this._initiateInstant}
 						>
 							{`INSTANT ${type.toUpperCase()}`}
 							<ArrowUpward className={classes.icon} />

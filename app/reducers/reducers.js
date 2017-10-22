@@ -4,12 +4,14 @@ import signUpForm from './signup_form_reducer';
 import dashboard from './dashboard_reducer';
 import addMoney from './add_money_reducer';
 import withdraw from './withdraw_form_reducer';
+import send from './send_reducer';
 
 const combineReducer = combineReducers({
   appLoad,
   signUpForm,
   dashboard,
   addMoney,
+  send,
   withdraw
 });
 

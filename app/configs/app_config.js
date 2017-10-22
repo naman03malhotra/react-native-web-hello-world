@@ -38,8 +38,10 @@ const API = {
 	//passbook
 	passbook: `http://${serverIp}/api/passbook`,
 	//send
-	sendBTC: `http://${serverIp}/api/btc/send`,
-	sendINR: `http://${serverIp}/api/fiat/send`
+	send: {
+		fiat: `http://${serverIp}/api/fiat/send`,
+		crypto: `http://${serverIp}/api/btc/send`
+	}
 };
 
 const COUNTRY_CODE = {
@@ -171,6 +173,71 @@ const ERRORS = {
 			code: null
 		}
 	},
+	SEND: {
+		ZERO_BALANCE: (fiat, crypto, mode) => {
+			return {
+				title: 'Zero balance',
+				message: `Your current ${mode === 'fiat'
+					? fiat.toUpperCase()
+					: crypto.toUpperCase()} balance is ZERO`,
+				code: mode === 'fiat' ? 0 : 10
+			};
+		},
+		SEND_MORE_THAN_CAPACITY: (
+			userData,
+			totalCrypto,
+			data,
+			fiat,
+			crypto,
+			mode
+		) => {
+			return {
+				title: 'Not enough balance',
+				message: `Your current wallet balance is ${mode === 'fiat'
+					? `${userData.balanceFiat} ${fiat.toUpperCase()}`
+					: `${totalCrypto} ${crypto.toUpperCase()}`} which is less than the amount(${data.amount} ${crypto.toUpperCase()}) you want to send`,
+				code: mode === 'fiat' ? 0 : 10
+			};
+		},
+		MIN_AMT: (minAmtCrypto, crypto) => {
+			return {
+				title: 'Minimum amount required',
+				message: `Minimum amount you can send is ${minAmtCrypto} ${crypto.toUpperCase()}`,
+				code: null
+			};
+		},
+		RECEPIENT_ADDRESS_MISSING: {
+			title: 'Recepient address required',
+			message: 'Please enter recepient address',
+			code: null
+		},
+		INVALID_RECEPIENT_ADDRESS: crypto => {
+			return {
+				title: 'Invalid address',
+				message: `Please enter a valid ${crypto.toUpperCase()} Wallet address`,
+				code: null
+			};
+		},
+		AMOUNT_MISSING: {
+			title: 'Amount required',
+			message: 'Please enter the amount you want to send',
+			code: null
+		},
+		CONFIRM: (data, crypto) => {
+			return {
+				title: 'Confirm send',
+				message: `Proceed with sending of ${data.amount} ${crypto.toUpperCase()} to ${data.to}?`,
+				code: 1
+			};
+		},
+		SUCCESS: (data, crypto) => {
+			return {
+				title: 'Sucess',
+				message: `Successfully sent ${data.amount} ${crypto.toUpperCase()} to ${data.to}`,
+				code: 2
+			};
+		}
+	},
 	WITHDRAW: {
 		ZERO_BALANCE: {
 			title: 'Zero wallet balance',
@@ -217,9 +284,14 @@ const MINIMUM = {
 	ADD_MONEY: {
 		inr: 5000
 	},
+	SEND: {
+		inr: 1,
+		btc: 0.005
+	},
 	WITHDRAW: {
 		inr: 5000
-	}
+	},
+	LENGTH: 10
 };
 
 export { API, COUNTRY_CODE, CLIENT, ERRORS, MINIMUM };

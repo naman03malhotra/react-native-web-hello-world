@@ -21,12 +21,12 @@ const sendPendingTransaction = (dispatch, newData, header) => {
 
 const addMoneyActions = {
 	amountInput: data => {
-		const dataToSend = {
+		const newData = {
 			amount: data
 		};
 		return {
 			type: ACTION.ADD_MONEY.AMOUNT_INPUT,
-			data: dataToSend
+			data: newData
 		};
 	},
 	validateData: (data, fiat) => {

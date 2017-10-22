@@ -69,9 +69,7 @@ class Dashboard extends Component {
 		loadTitle(title);
 	}
 	componentDidMount() {
-		this.setState({
-			isReady: false
-		});
+		this.setState({ isReady: true });
 	}
 
 	_handleChange = (event, index) => {

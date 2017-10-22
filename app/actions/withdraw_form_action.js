@@ -27,64 +27,28 @@ const withdrawActions = {
 			newData.error = ERRORS.WITHDRAW.MORE_MORE_THAN_CAPACITY;
 		} else if (userData.bankDetails.length === 0) {
 			newData.error = ERRORS.WITHDRAW.BANK;
-		}
+		} else {
+      newData.error = ERRORS.WITHDRAW.CONFIRM(
+        `${data.amount} ${fiat.toUpperCase()}`
+      );
+    }
 		return {
 			type: ACTION.WITHDRAW.VALIDATE_DATA,
 			data: newData
 		};
 	},
-	addBank: (data, userData, access_token) => {
-		const header = `Bearer ${access_token}`;
-		const dataToSend = data;
-		const newData = {
-			status: 0,
-			loading: true
-		};
-		let newUserData = userData;
-		newUserData.bankDetails = [];
-		newUserData.bankDetails.push(data);
-		return dispatch => {
-			dispatch({
-				type: ACTION.WITHDRAW.ADD_BANK,
-				data: newData
-			});
-			return APIManager.postData(API.addBank, dataToSend, header).then(res => {
-				newData.loading = false;
-				if (res.body.status === 1) {
-					newData.status = res.body.status;
-					dispatch({
-						type: ACTION.WITHDRAW.ADD_BANK,
-						data: newData
-					});
-					dispatch({
-						type: ACTION.APP.USER_LOAD,
-						data: newUserData
-					});
-				} else {
-					newData.status = res.body.status;
-					newData.error = ERRORS.DASHBOARD.FAILED(
-						JSON.stringify(res.body.errors[0])
-					);
-					dispatch({
-						type: ACTION.ADD_MONEY.VALIDATE_PAYMENT_REFDATA,
-						data: newData
-					});
-				}
-			});
-		};
-	},
-	confirmPrompt: (data, fiat) => {
-		const newData = {
-			error: null
-		};
-		newData.error = ERRORS.WITHDRAW.CONFIRM(
-			`${data.amount} ${fiat.toUpperCase()}`
-		);
-		return {
-			type: ACTION.WITHDRAW.SHOW_PROMPT,
-			data: newData
-		};
-	},
+	// confirmPrompt: (data, fiat) => {
+	// 	const newData = {
+	// 		error: null
+	// 	};
+	// 	newData.error = ERRORS.WITHDRAW.CONFIRM(
+	// 		`${data.amount} ${fiat.toUpperCase()}`
+	// 	);
+	// 	return {
+	// 		type: ACTION.WITHDRAW.SHOW_PROMPT,
+	// 		data: newData
+	// 	};
+	// },
 	initiateDeposit: (data, access_token) => {
 		const header = `Bearer ${access_token}`;
 		const dataToSend = {
@@ -111,6 +75,46 @@ const withdrawActions = {
 					dispatch({
 						type: ACTION.WITHDRAW.INITIATE,
 						data: newData
+					});
+				} else {
+					newData.status = res.body.status;
+					newData.error = ERRORS.DASHBOARD.FAILED(
+						JSON.stringify(res.body.errors[0])
+					);
+					dispatch({
+						type: ACTION.ADD_MONEY.VALIDATE_PAYMENT_REFDATA,
+						data: newData
+					});
+				}
+			});
+		};
+  },
+  addBank: (data, userData, access_token) => {
+		const header = `Bearer ${access_token}`;
+		const dataToSend = data;
+		const newData = {
+			status: 0,
+			loading: true
+		};
+		let newUserData = userData;
+		newUserData.bankDetails = [];
+		newUserData.bankDetails.push(data);
+		return dispatch => {
+			dispatch({
+				type: ACTION.WITHDRAW.ADD_BANK,
+				data: newData
+			});
+			return APIManager.postData(API.addBank, dataToSend, header).then(res => {
+				newData.loading = false;
+				if (res.body.status === 1) {
+					newData.status = res.body.status;
+					dispatch({
+						type: ACTION.WITHDRAW.ADD_BANK,
+						data: newData
+					});
+					dispatch({
+						type: ACTION.APP.USER_LOAD,
+						data: newUserData
 					});
 				} else {
 					newData.status = res.body.status;
