@@ -12,6 +12,7 @@ import Typography from 'material-ui/Typography';
 import SendIcon from 'material-ui-icons/Send';
 import SvgIcon from 'material-ui/SvgIcon';
 import Tabs, { Tab } from 'material-ui/Tabs';
+import Hidden from 'material-ui/Hidden';
 import SwipeableViews from 'react-swipeable-views';
 import Grid from 'material-ui/Grid';
 import TextField from 'material-ui/TextField';
@@ -91,75 +92,65 @@ const ETHIcon = props => (
 );
 function TabContainer(props) {
 	return (
-		<div style={{ padding: AppTheme.spaceExtraBig }}>{props.children}</div>
+		<div style={{ padding: AppTheme.spaceExtraBig }}>
+			<Grid container spacing={24}>
+				<Hidden xsDown>
+					<Grid item xs={3} />
+				</Hidden>
+				<Grid item xs={12} sm={6}>
+					{props.children}
+				</Grid>
+			</Grid>
+		</div>
 	);
 }
-class AddMoney extends Component {
+class Send extends Component {
 	state = {
-		loading: false,
-		success: false,
-		value: 0
+		indexValue: 0
 	};
-
-	componentWillUnmount() {
-		clearTimeout(this.timer);
+	componentWillMount() {
+		const { loadTitle, title } = this.props;
+		loadTitle(title);
 	}
-	handleChange = (event, value) => {
-		this.setState({ value });
+	_handleChange = (event, indexValue) => {
+		this.setState({ indexValue });
 	};
-
-	handleRequestClose = () => {
-		this.setState({ success: false });
+	_handleChangeSwipe = indexValue => {
+		this.setState({ indexValue });
 	};
-
-	handleButtonClick = () => {
-		if (!this.state.loading) {
-			this.setState(
-				{
-					success: false,
-					loading: true
-				},
-				() => {
-					this.timer = setTimeout(() => {
-						this.setState({
-							loading: false,
-							success: true
-						});
-					}, 1000);
-				}
-			);
-		}
-	};
-
-	timer = undefined;
 
 	render() {
-		const { loading, success } = this.state;
-		const { classes } = this.props;
+		console.log(this.props);
+		const { indexValue } = this.state;
+		const { fiat } = this.props;
+		const { classes, ...all } = this.props;
 		return (
 			<div>
 				<Grid container spacing={24}>
 					<Grid item xs={12} className={classes.gridStyle}>
 						<AppBar position="static" color="default">
 							<Tabs
-								value={this.state.value}
-								onChange={this.handleChange}
+								value={indexValue}
+								onChange={this._handleChange}
 								indicatorColor={AppTheme.colorPrimary}
 								textColor={AppTheme.colorPrimary}
 								fullWidth
 								centered
 							>
-								<Tab label="INR" icon={<INRIcon />} />
+								<Tab label={`${fiat.toUpperCase()}`} icon={<INRIcon />} />
 								<Tab label="BTC" icon={<BTCIcon />} />
 								<Tab label="ETH" icon={<ETHIcon />} />
 							</Tabs>
 						</AppBar>
-						<SwipeableViews index={this.state.value}>
+						<SwipeableViews
+							index={indexValue}
+							onChangeIndex={this._handleChangeSwipe}
+						>
 							<TabContainer>
-								<SendINR />
+								<SendINR {...all} mode="fiat" />
 							</TabContainer>
 							<TabContainer>
-								<SendBTC />
+								<SendINR {...all} mode="crypto" crypto="btc" />
 							</TabContainer>
 							<TabContainer>
 								<SendETH />
@@ -172,8 +163,8 @@ class AddMoney extends Component {
 	}
 }
 
-AddMoney.propTypes = {
+Send.propTypes = {
 	classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(AddMoney);
+export default withStyles(styles)(Send);

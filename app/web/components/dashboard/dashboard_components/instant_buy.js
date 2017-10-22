@@ -14,6 +14,7 @@ import { FormControl, FormHelperText } from 'material-ui/Form';
 import { CircularProgress } from 'material-ui/Progress';
 import AppTheme from '../../../../theme/variables';
 import CustomTextInput from '../../common/text_input';
+import SimpleAlert from '../../../components/common/simple_alert';
 
 const styles = theme => ({
 	textField: {
@@ -64,14 +65,19 @@ class InstantBuy extends Component {
 		cryptoRate: PropTypes.object.isRequired,
 		userData: PropTypes.object.isRequired,
 		access_token: PropTypes.string.isRequired,
-		type: PropTypes.string.isRequired
+		fiat: PropTypes.string.isRequired,
+		type: PropTypes.string.isRequired,
+		history: PropTypes.object.isRequired
 	};
 	state = {
 		cryptoAmt: 1,
 		fiatAmt: 0,
 		loading: false,
 		cryptoError: { message: null },
-		fiatError: { message: null }
+		fiatError: { message: null },
+		rate: null,
+		error: null,
+		status: 0
 	};
 
 	componentDidMount() {
@@ -97,8 +103,16 @@ class InstantBuy extends Component {
 				this.setState({ fiatAmt });
 			} catch (err) {}
 			try {
+				const rate = inputData[crypto][type][mode.FIAT].rate;
+				this.setState({ rate });
+			} catch (err) {}
+			try {
 				const loading = inputData[crypto][type].loading;
 				this.setState({ loading });
+			} catch (err) {}
+			try {
+				const status = inputData[crypto][type].status;
+				this.setState({ status });
 			} catch (err) {}
 		}
 	}
@@ -119,11 +133,104 @@ class InstantBuy extends Component {
 			crypto
 		);
 	};
+	_executeInstant = () => {
+		const { cryptoAmt, fiatAmt, rate } = this.state;
+		const {
+			userData,
+			dashboardActions,
+			crypto,
+			fiat,
+			history,
+			access_token,
+			type
+		} = this.props;
+		const data = {
+			volume: cryptoAmt,
+			amount: fiatAmt,
+			price: rate
+		};
+		const { error } = dashboardActions.validateData(
+			userData,
+			data,
+			crypto,
+			fiat,
+			type
+		).data;
+		if (error !== null) {
+			if (error.code === 0) {
+				error.closeButtonText = 'Close';
+				error.mainButtonText = 'Add Money';
+				error.func = () => {
+					history.push('/add-money');
+				};
+			} else if (error.code === 10) {
+				error.closeButtonText = 'Close';
+				error.mainButtonText = `Add ${crypto.toUpperCase()}`;
+				error.func = () => {
+					history.push('/receive');
+				};
+			} else if (error.code === 1) {
+				error.closeButtonText = 'Cancel';
+				error.mainButtonText = 'Confirm';
+				error.func = () => {
+					this._handleErrorRequestClose();
+					this._executeInstantFinal(data);
+				};
+			}
+			this.setState({ error });
+			return;
+		}
+	};
+	_executeInstantFinal = data => {
+		const {
+			dashboardActions,
+			crypto,
+			fiat,
+			history,
+			access_token,
+			type
+		} = this.props;
+		dashboardActions
+			.executeInstant(data, access_token, crypto, fiat, type)
+			.then(() => {
+				const { error } = this.props.dashboard.manageAmount;
+				const { status } = this.state;
+				if (status === 1) {
+					error.closeButtonText = 'close';
+					error.mainButtonText = 'Check Passbook';
+					error.func = () => {
+						history.push('/passbook');
+					};
+				}
+				this.setState({ error });
+			});
+	};
+	_handleErrorRequestClose = () => {
+		this.setState({ error: null });
+	};
 	render() {
-		const { cryptoAmt, fiatAmt, loading, cryptoError, fiatError } = this.state;
+		const {
+			cryptoAmt,
+			fiatAmt,
+			loading,
+			cryptoError,
+			fiatError,
+			error
+		} = this.state;
 		const { classes, fiat, type, crypto } = this.props;
 		return (
 			<Grid container spacing={24}>
+				{error && (
+					<SimpleAlert
+						open
+						title={error.title}
+						message={error.message}
+						close={this._handleErrorRequestClose}
+						mainButtonFunc={error.func}
+						closeButtonText={error.closeButtonText}
+						mainButtonText={error.mainButtonText}
+					/>
+				)}
 				<Grid item xs={6} className={classes.gridStyle}>
 					<CustomTextInput
 						label={crypto}
@@ -146,7 +253,12 @@ class InstantBuy extends Component {
 				</Grid>
 				<Grid item xs={12} className={classes.gridStyle}>
 					{!loading ? (
-						<Button raised color="primary" className={classes.button}>
+						<Button
+							raised
+							color="primary"
+							className={classes.button}
+							onClick={this._executeInstant}
+						>
 							{`INSTANT ${type.toUpperCase()}`}
 							<ArrowUpward className={classes.icon} />
 						</Button>

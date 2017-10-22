@@ -17,18 +17,21 @@ const styles = theme => ({
 });
 
 class SimpleSnackbar extends React.Component {
-	state = {
-		open: true
+	static propTypes = {
+		classes: PropTypes.object.isRequired,
+		message: PropTypes.object.isRequired,
+		open: PropTypes.bool.isRequired,
+		close: PropTypes.func.isRequired,
+		otp: PropTypes.bool
 	};
-
 	render() {
 		const { classes, message, open, close, otp } = this.props;
 		return (
 			<div>
 				<Snackbar
 					anchorOrigin={{
-						vertical: 'top',
-						horizontal: 'center'
+						vertical: 'bottom',
+						horizontal: 'right'
 					}}
 					open={open}
 					autoHideDuration={5000}
@@ -38,17 +41,19 @@ class SimpleSnackbar extends React.Component {
 						'aria-describedby': 'message-id'
 					}}
 					message={<span id="message-id">{message}</span>}
-					action={!otp && [
-						<IconButton
-							key="close"
-							aria-label="Close"
-							color="accent"
-							className={classes.close}
-							onClick={close}
-						>
-							<CloseIcon />
-						</IconButton>
-					]}
+					action={
+						!otp && [
+							<IconButton
+								key="close"
+								aria-label="Close"
+								color="accent"
+								className={classes.close}
+								onClick={close}
+							>
+								<CloseIcon />
+							</IconButton>
+						]
+					}
 				/>
 			</div>
 		);

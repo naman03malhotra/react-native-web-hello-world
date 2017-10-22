@@ -74,16 +74,17 @@ class BalanceDashboard extends Component {
 	static propTypes = {
 		classes: PropTypes.object.isRequired,
 		cryptoRate: PropTypes.object.isRequired,
-		userData: PropTypes.object.isRequired
+		userData: PropTypes.object.isRequired,
+		fiat: PropTypes.string.isRequired
 	};
 	state = {
 		value: 0
 	};
 
 	render() {
-		const { classes, userData, cryptoRate } = this.props;
+		const { classes, userData, cryptoRate, fiat } = this.props;
 		const totalBTC = (userData.btc.balanceReal + userData.btc.balanceVirtual
-		).toFixed(2);
+		).toFixed(4);
 
 		return (
 			<Grid container spacing={24}>
@@ -114,7 +115,7 @@ class BalanceDashboard extends Component {
 											primary={`${totalBTC} BTC`}
 											secondary={`${(totalBTC * cryptoRate.btc.sell).toFixed(
 												2
-											)} INR`}
+											)} ${fiat.toUpperCase()}`}
 											className={classes.listSecondaryItem}
 										/>
 									</ListItemSecondaryAction>
@@ -130,8 +131,8 @@ class BalanceDashboard extends Component {
 									<ListItemSecondaryAction>
 										<ListItemText
 											className={classes.listSecondaryItem}
-											primary="0.0000"
-											secondary={'₹ 0.00'}
+											primary="0.0000 ETH"
+											secondary={`0.00 ${fiat.toUpperCase()}`}
 										/>
 									</ListItemSecondaryAction>
 								</ListItem>

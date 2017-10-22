@@ -8,8 +8,8 @@ import { FormControl, FormHelperText } from 'material-ui/Form';
 
 const styles = theme => ({
 	textField: {
-		margin: AppTheme.spacingUnit,
-		fontSize: AppTheme.spacingUnit * 2.5
+		fontSize: AppTheme.spacingUnit * 2.5,
+		width: '100%'
 	},
 	colorPrimary: {
 		color: AppTheme.colorPrimary

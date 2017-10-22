@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import AppBar from 'material-ui/AppBar';
 import { withStyles } from 'material-ui/styles';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { CircularProgress } from 'material-ui/Progress';
 import green from 'material-ui/colors/green';
 import Button from 'material-ui/Button';
-import CheckIcon from 'material-ui-icons/Check';
 import ArrowForward from 'material-ui-icons/ArrowForward';
 import Typography from 'material-ui/Typography';
 import SendIcon from 'material-ui-icons/Send';
@@ -16,10 +17,13 @@ import SwipeableViews from 'react-swipeable-views';
 import Grid from 'material-ui/Grid';
 import TextField from 'material-ui/TextField';
 import Color from 'color';
-
+import AddIcon from 'material-ui-icons/Add';
+import CheckIcon from 'material-ui-icons/Check';
+import CustomTextInput from '../../common/text_input';
 import AddBankModal from './add_bank_modal';
-
 import AppTheme from '../../../../theme/variables';
+import SimpleAlert from '../../../components/common/simple_alert';
+import withdrawActions from '../../../../actions/withdraw_form_action';
 
 const styles = theme => ({
 	root: {
@@ -56,24 +60,23 @@ const styles = theme => ({
 	icon: {
 		marginLeft: AppTheme.spacingUnit
 	},
+	iconAdd: {
+		marginRight: AppTheme.spacingUnit
+	},
 	button: {
 		width: '100%',
 		padding: AppTheme.spacingUnit * 2,
 		marginTop: AppTheme.spacingUnit * 4,
-		backgroundColor: AppTheme.colorPrimary,
-		color: AppTheme.colorWhite,
-		'&:hover': {
-			backgroundColor: Color(AppTheme.colorPrimary)
-				.lighten(0.3)
-				.hex()
-		}
+		color: AppTheme.colorWhite
 	},
 	addBankButton: {
-		backgroundColor: AppTheme.colorPrimary,
 		padding: AppTheme.spacingUnit * 2,
 		marginTop: AppTheme.spacingUnit * 2,
-		width: '200px',
-		borderRadius: '50px',
+		minWidth: '200px',
+		borderRadius: '50px'
+	},
+	primaryBackground: {
+		backgroundColor: AppTheme.colorPrimary,
 		'&:hover': {
 			backgroundColor: Color(AppTheme.colorPrimary)
 				.lighten(0.3)
@@ -81,6 +84,7 @@ const styles = theme => ({
 		}
 	}
 });
+
 const INRIcon = props => (
 	<SvgIcon {...props}>
 		<path d="M8,3H18L17,5H13.74C14.22,5.58 14.58,6.26 14.79,7H18L17,9H15C14.75,11.57 12.74,13.63 10.2,13.96V14H9.5L15.5,21H13L7,14V12H9.5V12C11.26,12 12.72,10.7 12.96,9H7L8,7H12.66C12.1,5.82 10.9,5 9.5,5H7L8,3Z" />
@@ -105,100 +109,192 @@ function TabContainer(props) {
 }
 class WithdrawForm extends Component {
 	state = {
-		loading: false,
 		success: false,
 		open: false,
-		value: 0
+		error: null
 	};
-
-	componentWillUnmount() {
-		clearTimeout(this.timer);
-	}
-	handleChange = (event, value) => {
-		this.setState({ value });
+	static propTypes = {
+		classes: PropTypes.object.isRequired
 	};
-
-	handleRequestClose = () => {
-		this.setState({ success: false });
-	};
-
-	handleButtonClick = () => {
-		if (!this.state.loading) {
-			this.setState(
-				{
-					success: false,
-					loading: true
-				},
-				() => {
-					this.timer = setTimeout(() => {
-						this.setState({
-							loading: false,
-							success: true
-						});
-					}, 1000);
-				}
-			);
+	_initiateWithdraw = event => {
+		event.preventDefault();
+		const {
+			withdraw,
+			withdrawActions,
+			userData,
+			access_token,
+			fiat
+		} = this.props;
+		let { error } = withdrawActions.validateData(
+			withdraw.amountInput,
+			fiat,
+			userData
+		).data;
+		if (error !== null) {
+			if (error.code === 0) {
+				error.closeButtonText = 'Close';
+				error.mainButtonText = 'Add Bank';
+				error.func = () => {
+					this._handleErrorRequestClose();
+					this._toggleModal();
+				};
+			}
+			this.setState({ error });
+			return;
+		}
+		error = withdrawActions.confirmPrompt(withdraw.amountInput, fiat).data
+			.error;
+		if (error.code === 1) {
+			error.closeButtonText = 'Cancel';
+			error.mainButtonText = 'Confirm';
+			error.func = () => {
+				this._handleErrorRequestClose();
+				this._initiateDeposit(withdraw.amountInput);
+			};
+			this.setState({ error });			
 		}
 	};
 
+	_initiateDeposit = data => {
+		const { withdraw, withdrawActions, access_token, history } = this.props;
+		withdrawActions
+			.initiateDeposit(withdraw.amountInput, access_token)
+			.then(() => {
+				const { status, error } = this.props.withdraw.amountInput;
+				if (status === 1) {
+					error.closeButtonText = 'Close';
+					error.mainButtonText = 'See Transactions';
+					error.func = () => {
+						this._handleErrorRequestClose();
+						history.push('/passbook');
+					};
+					this.setState({ error });
+				} else {
+					this.setState({ error });
+				}
+			});
+	};
 	_toggleModal = () => {
 		this.setState({
 			open: !this.state.open
 		});
 	};
-
-	timer = undefined;
+	_handleErrorRequestClose = () => {
+		this.setState({ error: null });
+	};
 
 	render() {
-		const { loading, success, open } = this.state;
-		const { classes } = this.props;
+		console.log(this.props);
+		const { open, error } = this.state;
+		const {
+			classes,
+			withdraw,
+			withdrawActions,
+			userData,
+			access_token,
+			fiat
+		} = this.props;
 		return (
 			<div>
-				<AddBankModal open={open} handleRequestClose={this._toggleModal} />
+				{error && (
+					<SimpleAlert
+						open
+						title={error.title}
+						message={error.message}
+						close={this._handleErrorRequestClose}
+						mainButtonFunc={error.func}
+						closeButtonText={error.closeButtonText}
+						mainButtonText={error.mainButtonText}
+					/>
+				)}
+				<AddBankModal
+					open={open}
+					handleRequestClose={this._toggleModal}
+					withdraw={withdraw}
+					userData={userData}
+					withdrawActions={withdrawActions}
+					access_token={access_token}
+				/>
 				<div className={classes.balanceContainer}>
 					<Typography type="subheading">Your Balance</Typography>
 					<Typography type="title" className={classes.title}>
-						<INRIcon />500000
+						{`${userData.balanceFiat}`}
 					</Typography>
-					<Typography type="subheading">Indian Rupee</Typography>
+					<Typography type="subheading">{`${fiat.toUpperCase()}`}</Typography>
 				</div>
-				<TextField
-					label="Enter Amount"
-					className={classes.textField}
-					helperText="Some important text"
-					fullWidth
-				/>
-				<Button
-					raised
-					color="primary"
-					className={classes.addBankButton}
-					onClick={this._toggleModal}
-				>
-					Add Bank
-				</Button>
-				<div>
-					{!loading ? (
+				<form onSubmit={this._initiateWithdraw}>
+					<CustomTextInput
+						label="Enter Amount"
+						type="number"
+						helperText="Some important text"
+						value={withdraw.amountInput.amount}
+						onChange={event =>
+							withdrawActions.amountInput(event.currentTarget.value)}
+					/>
+					{userData.bankDetails.length > 0 ? (
 						<Button
 							raised
-							className={classes.button}
-							onClick={this.handleButtonClick}
+							color="primary"
+							className={classNames(
+								classes.addBankButton,
+								classes.buttonSuccess
+							)}
+							onClick={this._toggleModal}
 						>
-							Withdraw
-							<SendIcon className={classes.icon} />
+							<CheckIcon className={classes.iconAdd} />
+							{userData.bankDetails[0].bankName}
 						</Button>
 					) : (
-						<Button raised disabled={loading} className={classes.button}>
-							<CircularProgress size={24} className={classes.fabProgress} />
+						<Button
+							raised
+							color="primary"
+							className={classNames(
+								classes.addBankButton,
+								classes.primaryBackground
+							)}
+							onClick={this._toggleModal}
+						>
+							<AddIcon className={classes.iconAdd} /> Add Bank
 						</Button>
 					)}
-				</div>
+					<div>
+						{!withdraw.amountInput.loading ? (
+							<Button
+								raised
+								className={classNames(
+									classes.button,
+									classes.primaryBackground
+								)}
+								onClick={this.handleButtonClick}
+								type="submit"
+							>
+								Withdraw
+								<SendIcon className={classes.icon} />
+							</Button>
+						) : (
+							<Button raised disabled className={classes.button}>
+								<CircularProgress size={24} className={classes.fabProgress} />
+							</Button>
+						)}
+					</div>
+				</form>
 			</div>
 		);
 	}
 }
 
-WithdrawForm.propTypes = {
-	classes: PropTypes.object.isRequired
-};
+function mapStateToProps(state) {
+	return {
+		withdraw: state.app.withdraw
+	};
+}
 
-export default withStyles(styles)(WithdrawForm);
+function mapDispatchToProps(dispatch) {
+	return {
+		withdrawActions: bindActionCreators(withdrawActions, dispatch)
+	};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+	withStyles(styles)(WithdrawForm)
+);

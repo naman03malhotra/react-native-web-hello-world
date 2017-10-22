@@ -19,10 +19,12 @@ const API = {
 	//instant buy / Dashboard
 	getInstantPrice: {
 		buy: `http://${serverIp}/api/bid/getInstantBuyingPrice`,
-		sell: `http://${serverIp}/api/bid/getInstantSellingPrice`	
+		sell: `http://${serverIp}/api/bid/getInstantSellingPrice`
 	},
-	instantBuy: `http://${serverIp}/api/bid/instantBuy`,
-	instantSell: `http://${serverIp}/api/bid/instantSell`,
+	instant: {
+		buy: `http://${serverIp}/api/bid/instantBuy`,
+		sell: `http://${serverIp}/api/bid/instantSell`
+	},
 	//deposit
 	createDeposit: `http://${serverIp}/api/deposit/create`,
 	cancelDeposit: `http://${serverIp}/api/deposit/cancel`,
@@ -64,13 +66,160 @@ const ERRORS = {
 	DASHBOARD: {
 		NEGATIVE_NUMBER: {
 			title: 'Nagative Amount',
-			message: 'Please input a positive amount'
+			message: 'Please input a positive amount',
+			code: null
 		},
 		INVALID_NUMBER: {
 			title: 'Invalid Number',
-			message: 'Please input a valid number'
+			message: 'Please input a valid number',
+			code: null
+		},
+		WALLET_BALANCE_ZERO: {
+			buy: {
+				title: 'Zero Balance',
+				message: 'Your current wallet balance is ZERO',
+				code: 0
+			},
+			sell: {
+				title: 'Zero Balance',
+				message: 'Your current wallet balance is ZERO',
+				code: 10
+			}
+		},
+		BUY_MORE_THAN_CAPACITY: (
+			userData,
+			totalCrypto,
+			data,
+			crypto,
+			fiat,
+			type
+		) => {
+			return {
+				buy: {
+					title: 'You do not have have required wallet balance',
+					message: `With your current wallet balance of ${userData.balanceFiat} ${fiat.toUpperCase()} you can ${type} only ${(userData.balanceFiat /
+						data.price
+					).toFixed(
+						8
+					)} ${crypto.toUpperCase()}. Please add money to your wallet to ${type} ${data.volume}  ${crypto.toUpperCase()}`,
+					code: 0
+				},
+				sell: {
+					title: 'You do not have have required wallet balance',
+					message: `With your current wallet balance of ${totalCrypto} ${crypto.toUpperCase()} you can ${type} only ${totalCrypto} ${crypto.toUpperCase()}. Please add money to your wallet to ${type} ${data.volume}  ${crypto.toUpperCase()}`,
+					code: 10
+				}
+			};
+		},
+		MIN_AMT: (minAmtCrypto, minAmtFiat, type) => {
+			return {
+				title: 'Minimum amount required',
+				message: `Minimum amount you have to ${type} is ${minAmtCrypto} or ${minAmtFiat}`,
+				code: null
+			};
+		},
+		CONFIRM: (data, crypto, fiat, type) => {
+			return {
+				title: `Confirm ${type}ing`,
+				message: `Confirm ${type}ing of ${data.volume} ${crypto.toUpperCase()} for ${data.amount} ${fiat.toUpperCase()}`,
+				code: 1
+			};
+		},
+		SUCCESS: (data, crypto, fiat, type) => {
+			return {
+				title: `${type === 'buy' ? 'Purchased' : 'Sold'} Successfully`,
+				message: `Successfully ${type === 'buy'
+					? 'purchased'
+					: 'sold'} ${data.volume} ${crypto.toUpperCase()} for ${data.amount} ${fiat.toUpperCase()}`,
+				code: 2
+			};
+		},
+		FAILED: err => {
+			return {
+				title: 'Call Us',
+				message: err,
+				code: null
+			};
+		}
+	},
+	ADD_MONEY: {
+		MIN_AMT: data => {
+			return {
+				title: 'Minimim amount required',
+				message: `Minimum amount you have to deposit is ${data}`,
+				code: null
+			};
+		},
+		REF_DATA: {
+			title: 'Invalid reference',
+			message: 'Please enter a valid payment reference',
+			code: null
+		},
+		CANCEL: {
+			title: 'Cancel Transaction',
+			message: 'Are you sure you want to cancel this transaction?',
+			code: 1
+		},
+		SNACK_SUCCESS_UPDATE: {
+			title: 'Updated successfully',
+			message: 'Payment reference updated successfully',
+			code: null
+		},
+		SNACK_CANCEL: {
+			title: 'Cancelled Successfully',
+			message: 'Transaction cancelled successfully',
+			code: null
+		}
+	},
+	WITHDRAW: {
+		ZERO_BALANCE: {
+			title: 'Zero wallet balance',
+			message: 'You cannot withdraw as your current wallet balance is zero',
+			code: null
+		},
+		MIN_AMT: data => {
+			return {
+				title: 'Minimim amount required',
+				message: `Minimum amount you can withdraw is ${data}`,
+				code: null
+			};
+		},
+		MORE_MORE_THAN_CAPACITY: {
+			title: 'Cannot withdraw',
+			message: 'You cannot withdraw more that your account balance',
+			code: null
+		},
+		BANK: {
+			title: 'Bank not added',
+			message: 'Please add a bank to continue withdrawing',
+			code: 0
+		},
+		CONFIRM: data => {
+			return {
+				title: 'Confirm withdraw',
+				message: `Proceed with withdraw of ${data}?`,
+				code: 1
+			};
+		},
+		SUCCESS: {
+			title: 'Success',
+			message:
+				'Deposit request created successfully, the amount will be transferred to your bank account within 24 Hrs.',
+			code: 2
 		}
 	}
 };
 
-export { API, COUNTRY_CODE, CLIENT, ERRORS };
+const MINIMUM = {
+	DASHBOARD: {
+		btc: 1200
+	},
+	ADD_MONEY: {
+		inr: 5000
+	},
+	WITHDRAW: {
+		inr: 5000
+	}
+};
+
+export { API, COUNTRY_CODE, CLIENT, ERRORS, MINIMUM };

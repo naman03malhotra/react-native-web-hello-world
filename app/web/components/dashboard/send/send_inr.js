@@ -131,15 +131,19 @@ class SendINR extends Component {
 
 	render() {
 		const { loading, success } = this.state;
-		const { classes } = this.props;
+		const { classes, mode, userData, crypto, fiat } = this.props;
 		return (
 			<div>
 				<div className={classes.balanceContainer}>
 					<Typography type="subheading">Your Balance</Typography>
 					<Typography type="title" className={classes.title}>
-						<INRIcon />500000
+						{mode === 'fiat'
+							? userData.balanceFiat
+							: userData[crypto].balanceReal + userData[crypto].balanceVirtual}
 					</Typography>
-					<Typography type="subheading">Indian Rupee</Typography>
+					<Typography type="subheading">
+						{mode === 'fiat' ? fiat.toUpperCase() : crypto.toUpperCase()}
+					</Typography>
 				</div>
 				<TextField
 					label="Sender's Mobile Number"

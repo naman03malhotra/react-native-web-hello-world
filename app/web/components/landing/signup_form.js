@@ -152,7 +152,7 @@ class SignupForm extends Component {
 				<Hidden xsDown>
 					<Grid item xs={3} />
 				</Hidden>
-				{openError && (
+				{openError && ( ///////////////////////////////FIX THIS
 					<SimpleAlert
 						open={openError}
 						title={error.title}

@@ -12,6 +12,7 @@ import Typography from 'material-ui/Typography';
 import SendIcon from 'material-ui-icons/Send';
 import SvgIcon from 'material-ui/SvgIcon';
 import Tabs, { Tab } from 'material-ui/Tabs';
+import Hidden from 'material-ui/Hidden';
 import SwipeableViews from 'react-swipeable-views';
 import Grid from 'material-ui/Grid';
 import TextField from 'material-ui/TextField';
@@ -92,56 +93,33 @@ function TabContainer(props) {
 		<div style={{ padding: AppTheme.spaceExtraBig }}>{props.children}</div>
 	);
 }
-class AddMoney extends Component {
+class Withdraw extends Component {
+	static propTypes = {
+		classes: PropTypes.object.isRequired,
+		userData: PropTypes.object.isRequired,
+		access_token: PropTypes.string.isRequired,
+		title: PropTypes.string.isRequired,
+		loadTitle: PropTypes.func.isRequired,
+		history: PropTypes.object.isRequired,
+		location: PropTypes.object
+	};
 	state = {
-		loading: false,
-		success: false,
-		value: 0
+		indexValue: 0
 	};
-
-	componentWillUnmount() {
-		clearTimeout(this.timer);
+	componentWillMount() {
+		const { loadTitle, title } = this.props;
+		loadTitle(title);
 	}
-	handleChange = (event, value) => {
-		this.setState({ value });
-	};
-
-	handleRequestClose = () => {
-		this.setState({ success: false });
-	};
-
-	handleButtonClick = () => {
-		if (!this.state.loading) {
-			this.setState(
-				{
-					success: false,
-					loading: true
-				},
-				() => {
-					this.timer = setTimeout(() => {
-						this.setState({
-							loading: false,
-							success: true
-						});
-					}, 1000);
-				}
-			);
-		}
-	};
-
-	timer = undefined;
-
 	render() {
-		const { loading, success } = this.state;
-		const { classes } = this.props;
+		const { indexValue } = this.state;
+		const { classes, ...all } = this.props;
 		return (
 			<div>
 				<Grid container spacing={24}>
 					<Grid item xs={12} className={classes.gridStyle}>
 						<AppBar position="static" color="default">
 							<Tabs
-								value={this.state.value}
-								onChange={this.handleChange}
+								value={indexValue}
 								indicatorColor={AppTheme.colorPrimary}
 								textColor={AppTheme.colorPrimary}
 								fullWidth
@@ -150,9 +128,16 @@ class AddMoney extends Component {
 								<Tab label="Withdraw" icon={<INRIcon />} />
 							</Tabs>
 						</AppBar>
-						<SwipeableViews index={this.state.value}>
+						<SwipeableViews index={indexValue}>
 							<TabContainer>
-								<WithdrawForm />
+								<Grid container spacing={24} className={classes.gridContainer}>
+									<Hidden xsDown>
+										<Grid item xs={3} />
+									</Hidden>
+									<Grid item xs={12} sm={6}>
+										<WithdrawForm {...all} />
+									</Grid>
+								</Grid>
 							</TabContainer>
 						</SwipeableViews>
 					</Grid>
@@ -162,8 +147,4 @@ class AddMoney extends Component {
 	}
 }
 
-AddMoney.propTypes = {
-	classes: PropTypes.object.isRequired
-};
-
-export default withStyles(styles)(AddMoney);
+export default withStyles(styles)(Withdraw);

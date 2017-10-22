@@ -13,7 +13,7 @@ import SvgIcon from 'material-ui/SvgIcon';
 import dashboardActions from '../../../../actions/dashboard_actions';
 import AppTheme from '../../../../theme/variables';
 import InstantBuy from './instant_buy';
-import InstantSell from './instant_sell';
+// import InstantSell from './instant_sell';
 import BalanceDashboard from './balance_dashboard';
 
 const styles = theme => ({});
@@ -48,7 +48,9 @@ class Dashboard extends Component {
 		cryptoRate: PropTypes.object.isRequired,
 		userData: PropTypes.object.isRequired,
 		access_token: PropTypes.string.isRequired,
+		fiat: PropTypes.string.isRequired,
 		title: PropTypes.string.isRequired,
+		loadTitle: PropTypes.func.isRequired,
 		history: PropTypes.object.isRequired,
 		location: PropTypes.object
 	};
@@ -69,13 +71,7 @@ class Dashboard extends Component {
 	render() {
 		console.log(this.props);
 		const { index } = this.state;
-		const {
-			userData,
-			cryptoRate,
-			dashboard,
-			dashboardActions,
-			access_token
-		} = this.props;
+		const { classes, ...all } = this.props;
 		return (
 			<Grid container spacing={24}>
 				<Grid item xs={12} sm={6}>
@@ -94,53 +90,17 @@ class Dashboard extends Component {
 					</AppBar>
 					<SwipeableViews index={index} onChangeIndex={this._handleChangeSwipe}>
 						<TabContainer>
-							<InstantBuy
-								userData={userData}
-								cryptoRate={cryptoRate}
-								dashboard={dashboard}
-								dashboardActions={dashboardActions}
-								access_token={access_token}
-								crypto="btc"
-								fiat="inr"
-								type="buy"
-							/>
-							<InstantBuy
-								userData={userData}
-								cryptoRate={cryptoRate}
-								dashboard={dashboard}
-								dashboardActions={dashboardActions}
-								access_token={access_token}
-								crypto="btc"
-								fiat="inr"
-								type="sell"
-							/>
+							<InstantBuy {...all} crypto="btc" type="buy" />
+							<InstantBuy {...all} crypto="btc" type="sell" />
 						</TabContainer>
 						<TabContainer>
-							<InstantBuy
-								userData={userData}
-								cryptoRate={cryptoRate}
-								dashboard={dashboard}
-								dashboardActions={dashboardActions}
-								access_token={access_token}
-								crypto="btc"
-								fiat="inr"
-								type="buy"
-							/>
-							<InstantBuy
-								userData={userData}
-								cryptoRate={cryptoRate}
-								dashboard={dashboard}
-								dashboardActions={dashboardActions}
-								access_token={access_token}
-								crypto="btc"
-								fiat="inr"
-								type="sell"
-							/>
+							<InstantBuy {...all} crypto="btc" type="buy" />
+							<InstantBuy {...all} crypto="btc" type="sell" />
 						</TabContainer>
 					</SwipeableViews>
 				</Grid>
 				<Grid item xs={12} sm={6}>
-					<BalanceDashboard userData={userData} cryptoRate={cryptoRate} />
+					<BalanceDashboard {...all} />
 				</Grid>
 			</Grid>
 		);

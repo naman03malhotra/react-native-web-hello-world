@@ -9,7 +9,10 @@ import Dialog, {
 	DialogContentText,
 	DialogTitle
 } from 'material-ui/Dialog';
+import Grid from 'material-ui/Grid';
+import classNames from 'classnames';
 import { withStyles } from 'material-ui/styles';
+import { CircularProgress } from 'material-ui/Progress';
 import CloseIcon from 'material-ui-icons/Close';
 import Color from 'color';
 import AppTheme from '../../../../theme/variables';
@@ -26,8 +29,12 @@ const styles = theme => ({
 		width: '45px',
 		height: '45px'
 	},
+	buttonContainer: {
+		width: '100%'
+	},
 	buttonStyle: {
-		width: '200px',
+		borderRadius: '0px',
+		padding: AppTheme.spacingUnit * 3,
 		backgroundColor: AppTheme.colorPrimary,
 		'&:hover': {
 			backgroundColor: Color(AppTheme.colorPrimary)
@@ -39,19 +46,79 @@ const styles = theme => ({
 
 class AddBankModal extends React.Component {
 	state = {
-		open: false
+		accountNo: '',
+		ifsc: '',
+		bankName: '',
+		branchName: '',
+		city: ''
 	};
-
-	handleClickOpen = () => {
-		this.setState({ open: true });
+	componentWillReceiveProps(props) {
+		const { userData } = props;
+		if (userData.bankDetails !== undefined && userData.bankDetails.length > 0) {
+			const { accountNo, ifsc, bankName, branchName, city } = userData.bankDetails[0];
+			this.setState({
+				accountNo,
+				ifsc,
+				bankName,
+				branchName,
+				city
+			});
+		}
+	}
+	// _focusInput(inputField) {
+	// 	this[inputField]._root.focus();
+	// }
+	_saveBankDetails = () => {
+		const dataToSend = this.state;
+		const {
+			withdraw,
+			withdrawActions,
+			userData,
+			access_token,
+			handleRequestClose
+		} = this.props;
+		if (!this._validateData(dataToSend)) return;
+		withdrawActions.addBank(dataToSend, userData, access_token).then(() => {
+			const { status } = this.props.withdraw.addBank;
+			if (status === 1) {
+				handleRequestClose();
+			} else {
+				alert('Some error occured');
+			}
+		});
 	};
-
-	handleRequestClose = () => {
-		this.setState({ open: false });
+	_validateData = data => {
+		if (data.accountNo === '') {
+			alert('Please enter account number');
+			return false;
+		}
+		if (data.ifsc === '') {
+			alert('Please enter  IFSC code');
+			return false;
+		}
+		if (data.bankName === '') {
+			alert('Please enter bank name');
+			return false;
+		}
+		if (data.branchName === '') {
+			alert('Please enter branch name');
+			return false;
+		}
+		if (data.city === '') {
+			alert('Please enter city');
+			return false;
+		}
+		return true;
 	};
-
 	render() {
-		const { open, handleRequestClose, classes } = this.props;
+		const { accountNo, ifsc, bankName, branchName, city } = this.state;
+		const {
+			open,
+			handleRequestClose,
+			classes,
+			withdraw,
+			withdrawActions
+		} = this.props;
 		return (
 			<div>
 				<Dialog open={open} onRequestClose={handleRequestClose}>
@@ -70,6 +137,9 @@ class AddBankModal extends React.Component {
 							label="Account Number"
 							type="number"
 							fullWidth
+							value={accountNo}
+							onChange={event =>
+								this.setState({ accountNo: event.currentTarget.value })}
 						/>
 						<TextField
 							margin="dense"
@@ -77,6 +147,9 @@ class AddBankModal extends React.Component {
 							label="IFSC Code"
 							type="text"
 							fullWidth
+							value={ifsc}
+							onChange={event =>
+								this.setState({ ifsc: event.currentTarget.value })}
 						/>
 						<TextField
 							margin="dense"
@@ -84,6 +157,9 @@ class AddBankModal extends React.Component {
 							label="Bank Name"
 							type="text"
 							fullWidth
+							value={bankName}
+							onChange={event =>
+								this.setState({ bankName: event.currentTarget.value })}
 						/>
 						<TextField
 							margin="dense"
@@ -91,6 +167,9 @@ class AddBankModal extends React.Component {
 							label="Branch Name"
 							type="text"
 							fullWidth
+							value={branchName}
+							onChange={event =>
+								this.setState({ branchName: event.currentTarget.value })}
 						/>
 						<TextField
 							margin="dense"
@@ -98,16 +177,31 @@ class AddBankModal extends React.Component {
 							label="City"
 							type="text"
 							fullWidth
+							value={city}
+							onChange={event =>
+								this.setState({ city: event.currentTarget.value })}
 						/>
 					</DialogContent>
-					<DialogActions>
-						<Button onClick={handleRequestClose} color="primary">
-							Cancel
-						</Button>
-						<Button raised className={classes.buttonStyle} onClick={handleRequestClose} color="primary">
-							save
-						</Button>
-					</DialogActions>
+					<Grid container>
+						<Grid item xs={12}>
+							<Button
+								raised
+								className={classNames(
+									classes.buttonStyle,
+									classes.buttonContainer
+								)}
+								color="primary"
+								disabled={withdraw.addBank.loading}
+								onClick={this._saveBankDetails}
+							>
+								{!withdraw.addBank.loading ? (
+									'Save'
+								) : (
+									<CircularProgress size={24} className={classes.fabProgress} />
+								)}
+							</Button>
+						</Grid>
+					</Grid>
 				</Dialog>
 			</div>
 		);

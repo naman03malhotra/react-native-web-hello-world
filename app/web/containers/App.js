@@ -33,7 +33,11 @@ class App extends Component {
 	static propTypes = {
 		app: PropTypes.object.isRequired,
 		appActions: PropTypes.object.isRequired,
-		classes: PropTypes.object.isRequired
+		classes: PropTypes.object.isRequired,
+		fiat: PropTypes.string
+	};
+	static defaultProps = {
+		fiat: 'inr'
 	};
 	state = {
 		title: null,
@@ -63,7 +67,7 @@ class App extends Component {
 	};
 	render() {
 		const { title, isReady } = this.state;
-		const { app, classes } = this.props;
+		const { app, classes, fiat } = this.props;
 		// console.log(this.props);
 		return (
 			<div className="react-native-web">
@@ -88,6 +92,7 @@ class App extends Component {
 											userData={app.userData}
 											cryptoRate={app.cryptoRate}
 											loadTitle={this._renderTitle}
+											fiat={fiat}
 										/>
 									)}
 								/>
@@ -101,39 +106,93 @@ class App extends Component {
 											access_token={app.initialLoad.access_token}
 											userData={app.userData}
 											loadTitle={this._renderTitle}
+											fiat={fiat}
 										/>
 									)}
 								/>
 								<Route
-									title="Add Money"
 									exact
 									path="/add-money"
-									component={AddMoney}
+									render={routeProps => (
+										<AddMoney
+											{...routeProps}
+											title="Add Money"
+											access_token={app.initialLoad.access_token}
+											userData={app.userData}
+											loadTitle={this._renderTitle}
+											fiat={fiat}
+										/>
+									)}
 								/>
-								<Route title="Send" exact path="/send" component={Send} />
 								<Route
-									title="Receive"
+									exact
+									path="/send"
+									render={routeProps => (
+										<Send
+											{...routeProps}
+											title="Send"
+											access_token={app.initialLoad.access_token}
+											userData={app.userData}
+											loadTitle={this._renderTitle}
+											fiat={fiat}
+										/>
+									)}
+								/>
+								<Route
 									exact
 									path="/receive"
-									component={Receive}
+									render={routeProps => (
+										<Receive
+											{...routeProps}
+											title="Receive"
+											access_token={app.initialLoad.access_token}
+											userData={app.userData}
+											loadTitle={this._renderTitle}
+											fiat={fiat}
+										/>
+									)}
 								/>
 								<Route
-									title="Withdraw"
 									exact
 									path="/withdraw"
-									component={Withdraw}
+									render={routeProps => (
+										<Withdraw
+											{...routeProps}
+											title="Withdraw"
+											access_token={app.initialLoad.access_token}
+											userData={app.userData}
+											loadTitle={this._renderTitle}
+											fiat={fiat}
+										/>
+									)}
 								/>
 								<Route
-									title="Passbook"
 									exact
 									path="/passbook"
-									component={Passbook}
+									render={routeProps => (
+										<Passbook
+											{...routeProps}
+											title="Passbook"
+											access_token={app.initialLoad.access_token}
+											userData={app.userData}
+											loadTitle={this._renderTitle}
+											fiat={fiat}
+										/>
+									)}
 								/>
 								<Route
-									title="Settings"
 									exact
 									path="/settings"
-									component={Settings}
+									render={routeProps => (
+										<Settings
+											{...routeProps}
+											title="Settings"
+											access_token={app.initialLoad.access_token}
+											userData={app.userData}
+											loadTitle={this._renderTitle}
+											fiat={fiat}
+										/>
+									)}
 								/>
 							</Main>
 						</Route>

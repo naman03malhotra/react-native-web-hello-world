@@ -109,12 +109,12 @@ class Otp extends React.Component {
 		const openSnack = message !== null ? true : false;
 		return (
 			<div>
-				{openSnack && (
+				{openSnack && ( ///////////// FIX THIS.
 					<SnackBar
 						message={message}
-						open={openSnack}
+						open
 						close={this._closeSnackBar}
-						otp={true}
+						otp
 					/>
 				)}
 				<Dialog

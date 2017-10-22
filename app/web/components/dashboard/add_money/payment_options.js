@@ -30,8 +30,8 @@ class PaymentOptions extends Component {
 	state = {};
 
 	render() {
-		const { classes, progress } = this.props;
-
+		const { classes, progress, amount, fiat, fee } = this.props;
+		const totalAmount = (amount + (amount * fee)).toFixed(2);
 		return (
 			<List>
 				<ListItem button className={classes.list} onClick={() => progress(1)}>
@@ -45,10 +45,12 @@ class PaymentOptions extends Component {
 					<ListItemText
 						style={{ flex: 0.7 }}
 						primary="Payment Gateway | 30 Min Processing Time"
-						secondary={`2.5% of 50000 = 1250 INR | Pay via Net Banking / Credit Card / Debit Card / UPI`}
+						secondary={`${fee * 100}% of ${(amount).toFixed(2)} = ${(amount *
+							fee).toFixed(2)} ${fiat.toUpperCase()} | Pay via Net Banking / Credit Card / Debit Card / UPI`}
 					/>
 					<ListItemSecondaryAction style={{ flex: 0.2 }}>
-						<ListItemText primary={`₹ 51250.00`} secondary={'Fee: ₹ 1250.00'} />
+						<ListItemText primary={`${totalAmount} ${fiat.toUpperCase()}`} secondary={`Fee: ${(amount *
+							fee).toFixed(2)} ${fiat.toUpperCase()}`} />
 					</ListItemSecondaryAction>
 				</ListItem>
 				<Divider />
