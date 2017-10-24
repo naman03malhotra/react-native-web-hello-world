@@ -30,9 +30,10 @@ const sendActions = {
 		const minAmtCrypto = MINIMUM.SEND[crypto];
 		const minAddressLength = MINIMUM.LENGTH;
 
-		if (userData.balanceFiat === 0 && mode === 'fiat') {
-			newData.error = ERRORS.SEND.ZERO_BALANCE(fiat, crypto, mode);
-		} else if (totalCrypto === 0 && mode === 'crypto') {
+		if (
+			(userData.balanceFiat === 0 && mode === 'fiat') ||
+			(totalCrypto === 0 && mode === 'crypto')
+		) {
 			newData.error = ERRORS.SEND.ZERO_BALANCE(fiat, crypto, mode);
 		} else if (data.to === '') {
 			newData.error = ERRORS.SEND.RECEPIENT_ADDRESS_MISSING;
@@ -91,7 +92,9 @@ const sendActions = {
 						data: newData
 					});
 				} else {
-					newData.error = ERRORS.DASHBOARD.FAILED(JSON.stringify(res.body.errors[0]));
+					newData.error = ERRORS.DASHBOARD.FAILED(
+						JSON.stringify(res.body.errors[0])
+					);
 					dispatch({
 						type: ACTION.SEND.INITIATE,
 						data: newData

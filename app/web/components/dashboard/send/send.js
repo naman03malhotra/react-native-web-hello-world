@@ -22,7 +22,7 @@ import Color from 'color';
 import sendActions from '../../../../actions/send_action';
 import AppTheme from '../../../../theme/variables';
 
-import SendINR from './send_inr';
+import SendMain from './send_main';
 import SendBTC from './send_btc';
 import SendETH from './send_eth';
 
@@ -158,10 +158,10 @@ class Send extends Component {
 							onChangeIndex={this._handleChangeSwipe}
 						>
 							<TabContainer>
-								<SendINR {...all} mode="fiat" crypto={fiat} />
+								<SendMain {...all} mode="fiat" crypto={fiat} />
 							</TabContainer>
 							<TabContainer>
-								<SendINR {...all} mode="crypto" crypto="btc" />
+								<SendMain {...all} mode="crypto" crypto="btc" />
 							</TabContainer>
 							<TabContainer>
 								<SendETH />

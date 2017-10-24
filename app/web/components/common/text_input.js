@@ -14,7 +14,7 @@ const styles = theme => ({
 	colorPrimary: {
 		color: AppTheme.colorPrimary
 	},
-	captialize: {
+	uppercase: {
 		textTransform: 'uppercase'
 	},
 	inputField: {
@@ -29,24 +29,26 @@ class CustomTextInput extends Component {
 		classes: PropTypes.object.isRequired,
 		label: PropTypes.string.isRequired,
 		helperText: PropTypes.string,
-		error: PropTypes.bool
+		error: PropTypes.bool,
+		caps: PropTypes.bool
 	};
 	static defaultProps = {
-		error: false
+		error: false,
+		caps: false
 	};
 	state = {
 		focused: false
 	};
 	render() {
 		const { focused } = this.state;
-		const { classes, label, helperText, error, ...inputProps } = this.props;
+		const { classes, label, helperText, error, caps, ...inputProps } = this.props;
 		return (
 			<FormControl className={classes.textField} error={error}>
 				<InputLabel
 					className={classNames({
 						[classes.colorPrimary]: !error && focused
 					},
-					classes.captialize)}
+					{[classes.uppercase]: caps})}
 				>
 					{label}
 				</InputLabel>

@@ -3,6 +3,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import SwipeableViews from 'react-swipeable-views';
@@ -12,11 +14,13 @@ import TrendingUp from 'material-ui-icons/TrendingUp';
 import TrendingDown from 'material-ui-icons/TrendingDown';
 import { CircularProgress } from 'material-ui/Progress';
 import AppTheme from '../../../../theme/variables';
-import BuyBid from './bid';
+import BidMain from './bid_main';
 import SellBid from './ask';
 
 import ActiveBids from './active_bids';
 import ActiveOrders from './active_orders';
+import tradeActions from '../../../../actions/trade_action';
+import SnackBar from '../../common/snack_bar';
 
 const styles = theme => ({
 	fabProgress: {
@@ -53,17 +57,23 @@ TabContainer.propTypes = {
 	children: PropTypes.node.isRequired
 };
 
-class Dashboard extends Component {
+class Trade extends Component {
+	static propTypes = {
+		classes: PropTypes.object.isRequired,
+		userData: PropTypes.object.isRequired,
+		access_token: PropTypes.string.isRequired,
+		title: PropTypes.string.isRequired,
+		loadTitle: PropTypes.func.isRequired,
+		history: PropTypes.object.isRequired,
+		cryptoRate: PropTypes.object.isRequired,
+		location: PropTypes.object
+	};
 	state = {
 		index: 0,
 		cryptoGridValue: 0,
-		isReady: false
+		isReady: false,
+		snackMsg: null
 	};
-
-	static propTypes = {
-		classes: PropTypes.object.isRequired
-	};
-
 	componentWillMount() {
 		const { loadTitle, title } = this.props;
 		loadTitle(title);
@@ -71,29 +81,26 @@ class Dashboard extends Component {
 	componentDidMount() {
 		this.setState({ isReady: true });
 	}
-
 	_handleChange = (event, index) => {
 		if (index > 1) return;
 		this.setState({ index });
 	};
-
 	_handleChangeSwipe = index => {
 		if (index > 1) return;
 		this.setState({ index });
 	};
-
 	_cryptoHandleChange = (event, index) => {
 		if (index > 1) return;
 		this.setState({ cryptoGridValue: index });
 	};
-
 	_cryptoHandleChangeSwipe = index => {
 		if (index > 1) return;
 		this.setState({ cryptoGridValue: index });
 	};
 
-	_returnBTCGrid() {
+	_returnBTCGrid(crypto) {
 		const { index } = this.state;
+		const { classes, ...all } = this.props;
 		return (
 			<Grid container spacing={24}>
 				<Grid item xs={12} sm={6}>
@@ -112,10 +119,10 @@ class Dashboard extends Component {
 					</AppBar>
 					<SwipeableViews index={index} onChangeIndex={this._handleChangeSwipe}>
 						<TabContainer>
-							<BuyBid />
+							<BidMain {...all} crypto={crypto} type="buy" />
 						</TabContainer>
 						<TabContainer>
-							<SellBid />
+							<BidMain {...all} crypto={crypto} type="sell" />
 						</TabContainer>
 					</SwipeableViews>
 				</Grid>
@@ -135,24 +142,45 @@ class Dashboard extends Component {
 					</AppBar>
 					<SwipeableViews index={index} onChangeIndex={this._handleChangeSwipe}>
 						<TabContainer>
-							<ActiveBids />
+							<ActiveBids {...all} crypto={crypto} type="buy" />
 						</TabContainer>
 						<TabContainer>
-							<ActiveBids />
+							<ActiveBids {...all} crypto={crypto} type="sell" />
 						</TabContainer>
 					</SwipeableViews>
 				</Grid>
 				<Grid item xs={12} sm={12}>
-					<ActiveOrders />
+					<ActiveOrders
+						{...all}
+						crypto={crypto}
+						setSnackMsg={this._setSnackMsg}
+					/>
 				</Grid>
 			</Grid>
 		);
 	}
+	_setSnackMsg = snackMsg => {
+		this.setState({ snackMsg });
+	};
+	_closeSnackBar = (event, reason) => {
+		if (reason === 'clickaway') {
+			return;
+		}
+		this.setState({ snackMsg: null });
+	};
 	render() {
+		console.log(this.props);
 		const { classes } = this.props;
-		const { cryptoGridValue, isReady } = this.state;
+		const { cryptoGridValue, isReady, snackMsg } = this.state;
 		return (
 			<Grid container spacing={24} className={classes.gridContainer}>
+				{snackMsg && ( ///////////// FIX THIS.
+					<SnackBar
+						message={snackMsg.message}
+						open
+						close={this._closeSnackBar}
+					/>
+				)}
 				{!isReady ? (
 					<CircularProgress
 						className={classes.fabProgress}
@@ -178,8 +206,8 @@ class Dashboard extends Component {
 							index={cryptoGridValue}
 							onChangeIndex={this._cryptoHandleChangeSwipe}
 						>
-							<TabContainer>{this._returnBTCGrid()}</TabContainer>
-							<TabContainer>{this._returnBTCGrid()}</TabContainer>
+							<TabContainer>{this._returnBTCGrid('btc')}</TabContainer>
+							<TabContainer>{this._returnBTCGrid('btc')}</TabContainer>
 						</SwipeableViews>
 					</Grid>
 				)}
@@ -187,4 +215,19 @@ class Dashboard extends Component {
 		);
 	}
 }
-export default withStyles(styles)(Dashboard);
+
+function mapStateToProps(state) {
+	return {
+		trade: state.app.trade
+	};
+}
+
+function mapDispatchToProps(dispatch) {
+	return {
+		tradeActions: bindActionCreators(tradeActions, dispatch)
+	};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+	withStyles(styles)(Trade)
+);

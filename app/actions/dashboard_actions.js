@@ -107,23 +107,18 @@ const dashboardActions = {
 			userData[crypto].balanceReal + userData[crypto].balanceVirtual;
 		const minAmtCrypto = (MINIMUM.DASHBOARD[crypto] / data.price).toFixed(3);
 		const minAmtFiat = MINIMUM.DASHBOARD[crypto];
-		if (userData.balanceFiat === 0 && type === 'buy') {
+		if (
+			(userData.balanceFiat === 0 && type === 'buy') ||
+			(totalCrypto === 0 && type === 'sell')
+		) {
 			newData.error = ERRORS.DASHBOARD.WALLET_BALANCE_ZERO[type];
-		} else if (totalCrypto === 0 && type === 'sell') {
-			newData.error = ERRORS.DASHBOARD.WALLET_BALANCE_ZERO[type];
-		} else if (userData.balanceFiat < data.amount && type === 'buy') {
+		} else if (
+			(userData.balanceFiat < data.amount && type === 'buy') ||
+			(totalCrypto < data.volume && type === 'sell')
+		) {
 			newData.error = ERRORS.DASHBOARD.BUY_MORE_THAN_CAPACITY(
 				userData,
 				totalCrypto,
-				data,
-				crypto,
-				fiat,
-				type
-			)[type];
-		} else if (totalCrypto < data.volume && type === 'sell') {
-			newData.error = ERRORS.DASHBOARD.BUY_MORE_THAN_CAPACITY(
-				userData,
-				totalCrypto,				
 				data,
 				crypto,
 				fiat,

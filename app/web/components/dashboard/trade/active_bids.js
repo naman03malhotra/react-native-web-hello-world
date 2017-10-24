@@ -1,5 +1,3 @@
-/* eslint-disable flowtype/require-valid-file-annotation */
-
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
@@ -26,27 +24,33 @@ import Table, {
 	TableHead,
 	TableRow
 } from 'material-ui/Table';
+import { CircularProgress } from 'material-ui/Progress';
 
 import AppTheme from '../../../../theme/variables';
 
-
 let id = 0;
 function createData(price, amount, total) {
-  id += 1;
-  return { id, price, amount, total };
+	id += 1;
+	return { id, price, amount, total };
 }
 
 const data = [
-  createData(159, 6.0, 24),
-  createData(237, 9.0, 37),
-  createData(262, 16.0, 24),
-  createData(305, 3.7, 67),
-  createData(356, 16.0, 49),
+	createData(159, 6.0, 24),
+	createData(237, 9.0, 37),
+	createData(262, 16.0, 24),
+	createData(305, 3.7, 67),
+	createData(356, 16.0, 49)
 ];
 
 const styles = theme => ({
 	paper: {
 		marginTop: theme.spacing.unit
+	},
+	textCenter: {
+		textAlign: 'center'
+	},
+	fabProgress: {
+		color: AppTheme.colorPrimary
 	}
 });
 
@@ -55,34 +59,67 @@ class ActiveBids extends Component {
 		classes: PropTypes.object.isRequired
 	};
 	state = {
-		value: 0
+		bidData: []
 	};
+	componentDidMount() {
+		this._loadBids();
+		// this.interval = setInterval(this._loadBids, 2000);
+	}
+	componentWillReceiveProps(props) {
+		const { type, crypto, access_token, trade, tradeActions } = props;
+		const { inputData } = trade.getBidData;
 
+		if (inputData !== null) {
+			try {
+				const { bidData } = inputData[crypto][type];
+				this.setState({ bidData });
+			} catch (err) {}
+		}
+	}
+	componentWillUnmount() {
+		clearInterval(this.interval);
+	}
+	_loadBids = () => {
+		const { type, crypto, access_token, trade, tradeActions } = this.props;
+		tradeActions.getBidData(type, crypto, access_token);
+	};
+	_mapBids = data => {
+		const { crypto } = this.props;
+		return data.map(n => {
+			return (
+				<TableRow key={n._id}>
+					<TableCell>{n.price}</TableCell>
+					<TableCell>{`${n.volume} ${crypto.toUpperCase()}`}</TableCell>
+					<TableCell>{n.total}</TableCell>
+				</TableRow>
+			);
+		});
+	};
 	render() {
-		const { classes } = this.props;
-
+		const { bidData } = this.state;
+		const { classes, crypto, fiat } = this.props;
 		return (
 			<div className={classes.paper}>
-				<Table>
-					<TableHead>
-						<TableRow>
-							<TableCell>Price Per BTC</TableCell>
-							<TableCell>BTC Amount</TableCell>
-							<TableCell>Total (INR)</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{data.map(n => {
-							return (
-								<TableRow key={n.id}>
-									<TableCell>{n.price}</TableCell>
-									<TableCell>{`${n.amount} BTC`}</TableCell>
-									<TableCell>{n.total}</TableCell>
-								</TableRow>
-							);
-						})}
-					</TableBody>
-				</Table>
+				{bidData.length > 0 ? (
+					<Table>
+						<TableHead>
+							<TableRow>
+								<TableCell>Price Per BTC</TableCell>
+								<TableCell>{crypto.toUpperCase()} Volume</TableCell>
+								<TableCell>Total ({fiat.toUpperCase()})</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>{this._mapBids(bidData)}</TableBody>
+					</Table>
+				) : (
+					<div className={classes.textCenter}>
+						<CircularProgress
+							size={50}
+							thickness={0.5}
+							className={classes.fabProgress}
+						/>
+					</div>
+				)}
 			</div>
 		);
 	}

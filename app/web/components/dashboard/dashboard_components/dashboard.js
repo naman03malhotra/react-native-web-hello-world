@@ -67,7 +67,6 @@ class Dashboard extends Component {
 	_handleChangeSwipe = index => {
 		this.setState({ index });
 	};
-
 	render() {
 		console.log(this.props);
 		const { index } = this.state;

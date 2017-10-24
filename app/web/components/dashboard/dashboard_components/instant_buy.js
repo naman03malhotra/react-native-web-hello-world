@@ -236,6 +236,7 @@ class InstantBuy extends Component {
 						type="number"
 						value={cryptoAmt}
 						helperText={cryptoError.message}
+						caps
 						onChange={event =>
 							this._manageAmount(event.currentTarget.value, mode.CRYPTO)}
 					/>
@@ -246,6 +247,7 @@ class InstantBuy extends Component {
 						type="number"
 						value={fiatAmt}
 						helperText={fiatError.message}
+						caps
 						onChange={event =>
 							this._manageAmount(event.currentTarget.value, mode.FIAT)}
 					/>

@@ -105,6 +105,7 @@ class App extends Component {
 											title="Trade"
 											access_token={app.initialLoad.access_token}
 											userData={app.userData}
+											cryptoRate={app.cryptoRate}					
 											loadTitle={this._renderTitle}
 											fiat={fiat}
 										/>

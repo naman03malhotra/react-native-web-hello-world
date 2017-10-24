@@ -9,10 +9,14 @@ const API = {
 	//landing
 	currentBTCPrice: `http://${serverIp}/api/bid/currentBTCPrice`,
 	//Trading
-	createBuyBid: `http://${serverIp}/api/bid/buyer/create`,
-	createSellerBid: `http://${serverIp}/api/bid/seller/create`,
-	getBuyersBid: `http://${serverIp}/api/bid/buyer/get`,
-	getSellersBid: `http://${serverIp}/api/bid/seller/get`,
+	createBid: {
+		buy: `http://${serverIp}/api/bid/buyer/create`,
+		sell: `http://${serverIp}/api/bid/seller/create`
+	},
+	getBids: {
+		buy: `http://${serverIp}/api/bid/seller/get`,
+		sell: `http://${serverIp}/api/bid/buyer/get`
+	},
 	getActiveOrders: `http://${serverIp}/api/bid/history`,
 	cancelBuyerBid: `http://${serverIp}/api/bid/buyer/cancel`,
 	cancelSellerBid: `http://${serverIp}/api/bid/seller/cancel`,
@@ -98,7 +102,7 @@ const ERRORS = {
 		) => {
 			return {
 				buy: {
-					title: 'You do not have have required wallet balance',
+					title: 'Not enough balance',
 					message: `With your current wallet balance of ${userData.balanceFiat} ${fiat.toUpperCase()} you can ${type} only ${(userData.balanceFiat /
 						data.price
 					).toFixed(
@@ -107,7 +111,7 @@ const ERRORS = {
 					code: 0
 				},
 				sell: {
-					title: 'You do not have have required wallet balance',
+					title: 'Not enough balance',
 					message: `With your current wallet balance of ${totalCrypto} ${crypto.toUpperCase()} you can ${type} only ${totalCrypto} ${crypto.toUpperCase()}. Please add money to your wallet to ${type} ${data.volume}  ${crypto.toUpperCase()}`,
 					code: 10
 				}
@@ -142,6 +146,90 @@ const ERRORS = {
 				message: err,
 				code: null
 			};
+		}
+	},
+	TRADE: {
+		DEFAULT: (mode, type, crypto) => {
+			return {
+				title: '',
+				message:
+					mode === 'crypto'
+						? `Amount to ${type.toUpperCase()}`
+						: `Price per ${crypto.toUpperCase()}`,
+				noerror: true,
+				code: null
+			};
+		},
+		MIN_AMT: (amt, crypto) => {
+			return {
+				title: '',
+				message: `Minimum order amount: ${amt} ${crypto.toUpperCase()}`,
+				code: null
+			};
+		},
+		PRICE_DIFFERENCE: {
+			title: '',
+			message: 'Your price differs from the current market price significantly',
+			code: null
+		},
+		BUY_MORE_THAN_CAPACITY: (
+			userData,
+			totalCrypto,
+			data,
+			crypto,
+			fiat,
+			type
+		) => {
+			return {
+				buy: {
+					title: 'Not enough balance',
+					message: `Your current wallet balance is ${userData.balanceFiat} ${fiat.toUpperCase()}, which is less than the required total amount: ${data.total} ${fiat.toUpperCase()}`,
+					code: 0
+				},
+				sell: {
+					title: 'Not enough balance',
+					message: `Your current wallet balance is ${totalCrypto} ${crypto.toUpperCase()}, which is less than the amount you want to ${type}: ${data.volume} ${crypto.toUpperCase()}`,
+					code: 10
+				}
+			};
+		},
+		CONFIRM: (data, crypto, fiat, type) => {
+			return {
+				title: `Confirm placing ${type}ing bid?`,
+				message: `Confirm placing ${type}ing bid of ${data.volume} ${crypto.toUpperCase()} and ${data.price} ${fiat.toUpperCase()} for a total amount of ${data.total} ${fiat.toUpperCase()}`,
+				code: 1
+			};
+		},
+		SUCCESS: (data, crypto, fiat, type) => {
+			return {
+				1: {
+					title: `Success`,
+					message: `Bid resolved successfully`,
+					code: 2
+				},
+				2: {
+					title: `Partially resolved`,
+					message: `Bid partially resolved, check active orders`,
+					code: 2
+				},
+				3: {
+					title: `Not resolved`,
+					message: `Bid added successfully but not resolved`,
+					code: 2
+				}
+			};
+		},
+		CANCEL: number => {
+			return {
+				title: 'Cancel transactions',
+				message: `Are you sure you want to cancel the selected ${number} active orders?`,
+				code: 1
+			};
+		},
+		SNACK_CANCEL: {
+			title: 'Cancelled Successfully',
+			message: 'Selected orders cancelled successfully',
+			code: null
 		}
 	},
 	ADD_MONEY: {
@@ -281,6 +369,11 @@ const MINIMUM = {
 	DASHBOARD: {
 		btc: 1200
 	},
+	TRADE: {
+		btc: 0.01,
+		percentage: 0.3,
+		fee: 0.002
+	},
 	ADD_MONEY: {
 		inr: 5000
 	},
@@ -294,4 +387,9 @@ const MINIMUM = {
 	LENGTH: 10
 };
 
-export { API, COUNTRY_CODE, CLIENT, ERRORS, MINIMUM };
+const MODE = {
+	FIAT: 'fiat',
+	CRYPTO: 'crypto'
+};
+
+export { API, COUNTRY_CODE, CLIENT, ERRORS, MINIMUM, MODE };
