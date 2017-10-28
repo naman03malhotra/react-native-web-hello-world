@@ -46,27 +46,34 @@ const appLoadActions = {
 	},
 	loadRate: data => {
 		return dispatch => {
-			return APIManager.getData(API.currentBTCPrice, null, null)
-				.then(res => {
-					const rateData = {
-						btc: res.body.result
-					};
-					Store.save({
-						key: 'cryptoRate',
-						data: rateData,
-						expires: null
-					});
-					dispatch({
-						type: ACTION.APP.LOAD_RATE,
-						data: rateData
-					});
-				})
-				// .catch(err => {
-				// 	dispatch({
-				// 		type: ACTION.APP.APP_ERROR,
-				// 		data: err
-				// 	});
-				// });
+			return APIManager.getData(API.currentBTCPrice, null, null).then(res => {
+				const rateData = {
+					btc: res.body.result
+				};
+				Store.save({
+					key: 'cryptoRate',
+					data: rateData,
+					expires: null
+				});
+				dispatch({
+					type: ACTION.APP.LOAD_RATE,
+					data: rateData
+				});
+			});
+			// .catch(err => {
+			// 	dispatch({
+			// 		type: ACTION.APP.APP_ERROR,
+			// 		data: err
+			// 	});
+			// });
+		};
+	},
+	sendFirebaseToken: (data, access_token) => {
+		const header = `Bearer ${access_token}`;
+		return dispatch => {
+			return APIManager.postData(API.updateUser, data, header).then(res => {
+				return true;
+			});
 		};
 	}
 };

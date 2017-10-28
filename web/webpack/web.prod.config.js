@@ -1,10 +1,14 @@
 const path = require('path');
 const webpack = require('webpack');
+const UglifyJS = require('uglifyjs-webpack-plugin');
 
 module.exports = {
 	entry: [path.join(__dirname, '../../app/web/index')],
 	output: {
-		path: path.join(__dirname, '../public/builds'),
+		path: path.join(
+			__dirname,
+			'../../../express-react-native-web/web/public/builds'
+		),
 		filename: 'bundle.js',
 		publicPath: '/'
 	},
@@ -22,7 +26,10 @@ module.exports = {
 			},
 			{
 				test: /\.js$/,
-				exclude: /node_modules/,
+				include: [
+					path.resolve(__dirname, '../../app/web'),
+					path.resolve(__dirname, '../../node_modules/react-native-storage')
+				],
 				loader: 'babel-loader',
 				query: {
 					presets: ['es2015', 'react', 'stage-0']
@@ -40,8 +47,8 @@ module.exports = {
 		}),
 		// optimizations
 		new webpack.optimize.OccurrenceOrderPlugin(),
-		new webpack.optimize.UglifyJsPlugin({
-			compress: {
+		new UglifyJS({
+			uglifyOptions: {
 				warnings: false
 			}
 		})

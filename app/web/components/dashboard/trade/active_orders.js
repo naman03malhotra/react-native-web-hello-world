@@ -20,7 +20,7 @@ import Checkbox from 'material-ui/Checkbox';
 import IconButton from 'material-ui/IconButton';
 import Tooltip from 'material-ui/Tooltip';
 import DeleteIcon from 'material-ui-icons/Delete';
-import FilterListIcon from 'material-ui-icons/FilterList';
+import InfoIcon from 'material-ui-icons/Info';
 import { CircularProgress } from 'material-ui/Progress';
 import Color from 'color';
 import SimpleAlert from '../../../components/common/simple_alert';
@@ -73,8 +73,8 @@ class EnhancedTableHead extends React.Component {
 				disablePadding: true,
 				label: 'Txn ID'
 			},
+			{ id: 'Type', numeric: true, disablePadding: false, label: 'Type' },			
 			{ id: 'status', numeric: true, disablePadding: false, label: 'Status' },
-			{ id: 'Type', numeric: true, disablePadding: false, label: 'Type' },
 			{ id: 'Date', numeric: true, disablePadding: false, label: 'Date' },
 			{
 				id: 'amount',
@@ -181,15 +181,15 @@ let EnhancedTableToolbar = props => {
 			<div className={classes.spacer} />
 			<div className={classes.actions}>
 				{numSelected > 0 ? (
-					<Tooltip title="Delete">
-						<IconButton aria-label="Delete" onClick={initiateCancel}>
+					<Tooltip title="Cancel Orders">
+						<IconButton aria-label="Cancel Orders" onClick={initiateCancel}>
 							<DeleteIcon />
 						</IconButton>
 					</Tooltip>
 				) : (
-					<Tooltip title="Filter list">
-						<IconButton aria-label="Filter list">
-							<FilterListIcon />
+					<Tooltip title="Click on the rows to cancel the orders">
+						<IconButton aria-label="Click on the rows to cancel the orders">
+							<InfoIcon />
 						</IconButton>
 					</Tooltip>
 				)}
@@ -235,6 +235,21 @@ const styles = theme => ({
 				.lighten(0.3)
 				.hex()
 		}
+	},
+	colorSuccess: {
+		backgroundColor: Color(AppTheme.colorSuccess)
+			.lighten(0.7)
+			.hex()
+	},
+	colorError: {
+		backgroundColor: Color(AppTheme.colorError)
+			.lighten(0.5)
+			.hex()
+	},
+	colorWarning: {
+		backgroundColor: Color(AppTheme.colorWarning)
+			.lighten(0.7)
+			.hex()
 	}
 });
 
@@ -245,23 +260,7 @@ class EnhancedTable extends React.Component {
 			order: 'asc',
 			orderBy: 'calories',
 			selected: [],
-			// data: [
-			// 	createData('Cupcake', 305, 3.7, 67, 4.3),
-			// 	createData('Donut', 452, 25.0, 51, 4.9),
-			// 	createData('Eclair', 262, 16.0, 24, 6.0),
-			// 	createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-			// 	createData('Gingerbread', 356, 16.0, 49, 3.9),
-			// 	createData('Honeycomb', 408, 3.2, 87, 6.5),
-			// 	createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-			// 	createData('Jelly Bean', 375, 0.0, 94, 0.0),
-			// 	createData('KitKat', 518, 26.0, 65, 7.0),
-			// 	createData('Lollipop', 392, 0.2, 98, 0.0),
-			// 	createData('Marshmallow', 318, 0, 81, 2.0),
-			// 	createData('Nougat', 360, 19.0, 9, 37.0),
-			// 	createData('Oreo', 437, 18.0, 63, 4.0)
-			// ].sort((a, b) => (a.calories < b.calories ? -1 : 1)),
 			data: [],
-			transactions: [],
 			skip: 0,
 			page: 0,
 			rowsPerPage: 5,
@@ -314,6 +313,8 @@ class EnhancedTable extends React.Component {
 				tradeActions.cancelActiveOrders(dataToSend, access_token).then(() => {
 					const { status, error } = this.props.trade.cancelActiveOrders;
 					if (status !== 1) {
+						this.setState({ skip: 0, data: [], selected: [] });
+						this._loadTransactions();
 						setSnackMsg(error);
 					} else {
 						this.setState({ error });
@@ -458,13 +459,18 @@ class EnhancedTable extends React.Component {
 											tabIndex={-1}
 											key={n.transactionId}
 											selected={isSelected}
+											className={classNames({
+												[classes.colorSuccess]: n.status === 'COMPLETED',
+												[classes.colorWarning]: n.status === 'PENDING',
+												[classes.colorError]: n.status === 'CANCELLED'
+											})}
 										>
 											<TableCell padding="checkbox">
 												<Checkbox checked={isSelected} />
 											</TableCell>
 											<TableCell padding="none">{n.transactionId}</TableCell>
+											<TableCell numeric>{n.mode}</TableCell>										
 											<TableCell numeric>{n.status}</TableCell>
-											<TableCell numeric>{n.mode}</TableCell>
 											<TableCell numeric>{date}</TableCell>
 											<TableCell numeric>{n.volume}</TableCell>
 											<TableCell numeric>{n.price}</TableCell>
@@ -492,7 +498,9 @@ class EnhancedTable extends React.Component {
 							)}
 						</div>
 					)}
-					{data.length > 0 ? (
+				
+				</div>
+				{data.length > 0 ? (
 						<div className={classes.textCenter}>
 							{skip !== -1 ? (
 								<Button
@@ -518,7 +526,6 @@ class EnhancedTable extends React.Component {
 					) : (
 						''
 					)}
-				</div>
 			</div>
 		);
 	}

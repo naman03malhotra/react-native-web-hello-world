@@ -174,7 +174,7 @@ class Trade extends Component {
 		const { cryptoGridValue, isReady, snackMsg } = this.state;
 		return (
 			<Grid container spacing={24} className={classes.gridContainer}>
-				{snackMsg && ( ///////////// FIX THIS.
+				{snackMsg && (
 					<SnackBar
 						message={snackMsg.message}
 						open

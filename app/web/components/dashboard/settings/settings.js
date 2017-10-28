@@ -34,6 +34,10 @@ const styles = theme => ({
 
 class Settings extends Component {
 	state = {};
+	componentWillMount() {
+		const { loadTitle, title } = this.props;
+		loadTitle(title);
+	}
 
 	render() {
 		const { classes, progress } = this.props;

@@ -19,57 +19,14 @@ import Color from 'color';
 
 import AppTheme from '../../../../theme/variables';
 
-import ReceiveINR from './receive_inr';
+import ReceiveMain from './receive_main';
 import ReceiveBTC from './receive_btc';
 import ReceiveETH from './receive_eth';
+import SnackBar from '../../common/snack_bar';
 
 const styles = theme => ({
-	root: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-around'
-	},
-	textField: {
-		width: '100%',
-		fontSize: AppTheme.spacingUnit * 2
-	},
-	wrapper: {
-		margin: theme.spacing.unit,
-		position: 'relative'
-	},
-	balanceContainer: {
-		marginTop: AppTheme.spacingUnit * 3,
-		marginBottom: AppTheme.spacingUnit * 3
-	},
-	title: {
-		fontSize: AppTheme.spacingUnit * 4
-	},
 	gridStyle: {
 		textAlign: 'center'
-	},
-	buttonSuccess: {
-		backgroundColor: green[500],
-		'&:hover': {
-			backgroundColor: green[700]
-		}
-	},
-	fabProgress: {
-		color: AppTheme.colorPrimary
-	},
-	icon: {
-		marginLeft: AppTheme.spacingUnit
-	},
-	button: {
-		width: '100%',
-		padding: AppTheme.spacingUnit * 2,
-		marginTop: AppTheme.spacingUnit * 4,
-		backgroundColor: AppTheme.colorPrimary,
-		color: AppTheme.colorWhite,
-		'&:hover': {
-			backgroundColor: Color(AppTheme.colorPrimary)
-				.lighten(0.3)
-				.hex()
-		}
 	}
 });
 const INRIcon = props => (
@@ -95,74 +52,87 @@ function TabContainer(props) {
 	);
 }
 class Receive extends Component {
+	static propTypes = {
+		classes: PropTypes.object.isRequired
+	};
 	state = {
-		loading: false,
-		success: false,
-		value: 0
+		indexValue: 0,
+		snackMsg: null
 	};
-
-	componentWillUnmount() {
-		clearTimeout(this.timer);
+	componentWillMount() {
+		const { loadTitle, title } = this.props;
+		loadTitle(title);
 	}
-	handleChange = (event, value) => {
-		this.setState({ value });
+	_handleChange = (event, indexValue) => {
+		this.setState({ indexValue });
 	};
-
-	handleRequestClose = () => {
-		this.setState({ success: false });
+	_handleChangeSwipe = indexValue => {
+		this.setState({ indexValue });
 	};
-
-	handleButtonClick = () => {
-		if (!this.state.loading) {
-			this.setState(
-				{
-					success: false,
-					loading: true
-				},
-				() => {
-					this.timer = setTimeout(() => {
-						this.setState({
-							loading: false,
-							success: true
-						});
-					}, 1000);
-				}
-			);
+	_setSnackMsg = snackMsg => {
+		this.setState({ snackMsg });
+	};
+	_closeSnackBar = (event, reason) => {
+		if (reason === 'clickaway') {
+			return;
 		}
+		this.setState({ snackMsg: null });
 	};
-
-	timer = undefined;
 
 	render() {
-		const { loading, success } = this.state;
-		const { classes } = this.props;
+		console.log(this.props);
+		const { snackMsg } = this.state;
+		const { indexValue } = this.state;
+		const { fiat } = this.props;
+		const { classes, ...all } = this.props;
 		return (
 			<div>
+				{snackMsg && (
+					<SnackBar message={snackMsg} open close={this._closeSnackBar} />
+				)}
 				<Grid container spacing={24}>
 					<Grid item xs={12} className={classes.gridStyle}>
 						<AppBar position="static" color="default">
 							<Tabs
-								value={this.state.value}
-								onChange={this.handleChange}
+								value={indexValue}
+								onChange={this._handleChange}
 								indicatorColor={AppTheme.colorPrimary}
 								textColor={AppTheme.colorPrimary}
 								fullWidth
 								centered
 							>
-								<Tab label="INR" icon={<INRIcon />} />
+								<Tab label={`${fiat.toUpperCase()}`} icon={<INRIcon />} />
 								<Tab label="BTC" icon={<BTCIcon />} />
 								<Tab label="ETH" icon={<ETHIcon />} />
 							</Tabs>
 						</AppBar>
-						<SwipeableViews index={this.state.value}>
+						<SwipeableViews
+							index={indexValue}
+							onChangeIndex={this._handleChangeSwipe}
+						>
 							<TabContainer>
-								<ReceiveINR />
+								<ReceiveMain
+									{...all}
+									crypto={fiat}
+									mode="fiat"
+									setSnackMsg={this._setSnackMsg}
+								/>
 							</TabContainer>
 							<TabContainer>
-								<ReceiveBTC />
+								<ReceiveMain
+									{...all}
+									crypto="btc"
+									mode="crypto"
+									setSnackMsg={this._setSnackMsg}
+								/>
 							</TabContainer>
 							<TabContainer>
-								<ReceiveETH />
+								<ReceiveMain
+									{...all}
+									crypto="btc"
+									mode="crypto"
+									setSnackMsg={this._setSnackMsg}
+								/>
 							</TabContainer>
 						</SwipeableViews>
 					</Grid>
@@ -171,9 +141,5 @@ class Receive extends Component {
 		);
 	}
 }
-
-Receive.propTypes = {
-	classes: PropTypes.object.isRequired
-};
 
 export default withStyles(styles)(Receive);

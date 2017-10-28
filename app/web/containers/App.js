@@ -8,6 +8,8 @@ import { CircularProgress } from 'material-ui/Progress';
 
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
+import firebase from '../components/common/firebase';
+
 import Main from '../components/dashboard/main';
 import Dashboard from '../components/dashboard/dashboard_components/dashboard';
 import Trade from '../components/dashboard/trade/trade';
@@ -28,6 +30,7 @@ const styles = theme => ({
 		zIndex: 1
 	}
 });
+const messaging = firebase.messaging();
 
 class App extends Component {
 	static propTypes = {
@@ -43,7 +46,7 @@ class App extends Component {
 		title: null,
 		isReady: false
 	};
-	componentWillMount() {
+	componentDidMount() {
 		const { app, appActions } = this.props;
 		appActions.appLoad().then(() => {
 			const { app } = this.props;
@@ -54,6 +57,11 @@ class App extends Component {
 			}
 			appActions.loadUserData(access_token).then(() => {
 				appActions.loadRate().then(() => {
+					this.interval = setInterval(
+						() => appActions.loadUserData(access_token),
+						4000
+					);
+					// this._registerFirebase();
 					this.setState({
 						isReady: true
 					});
@@ -61,13 +69,57 @@ class App extends Component {
 			});
 		});
 	}
+	componentWillUnmount() {
+		clearInterval(this.interval);
+	}
+
+	// _registerFirebase = () => {
+	// 	messaging
+	// 		.requestPermission()
+	// 		.then(() => {
+	// 			console.log('Notification permission granted.');
+	// 			this._fetchToken();
+	// 		})
+	// 		.catch(err => {
+	// 			console.log('Unable to get permission to notify.', err);
+	// 		});
+	// };
+	// _fetchToken = () => {
+	// 	const { app, appActions } = this.props;
+	// 	const access_token = app.initialLoad.access_token;
+	// 	messaging
+	// 		.getToken()
+	// 		.then(currentToken => {
+	// 			if (currentToken) {
+	// 				console.log(currentToken);
+	// 				const firebaseToken = {
+	// 					firebaseRegistrationTokens: currentToken
+	// 				};
+
+	// 				this._mountMessaging();
+	// 				appActions.sendFirebaseToken(firebaseToken, access_token);
+	// 			} else {
+	// 				console.log(
+	// 					'No Instance ID token available. Request permission to generate one.'
+	// 				);
+	// 			}
+	// 		})
+	// 		.catch(err => {
+	// 			console.log('An error occurred while retrieving token. ', err);
+	// 		});
+	// };
+	// _mountMessaging = () => {
+	// 	messaging.onMessage(message => {
+	// 		console.log(message);
+	// 	});
+	// };
 	_renderTitle = title => {
 		document.title = title;
 		this.setState({ title });
 	};
 	render() {
 		const { title, isReady } = this.state;
-		const { app, classes, fiat } = this.props;
+		const { app, classes, fiat, appActions } = this.props;
 		// console.log(this.props);
 		return (
 			<div className="react-native-web">
@@ -93,6 +145,7 @@ class App extends Component {
 											cryptoRate={app.cryptoRate}
 											loadTitle={this._renderTitle}
 											fiat={fiat}
+											appActions={appActions}
 										/>
 									)}
 								/>
@@ -105,7 +158,7 @@ class App extends Component {
 											title="Trade"
 											access_token={app.initialLoad.access_token}
 											userData={app.userData}
-											cryptoRate={app.cryptoRate}					
+											cryptoRate={app.cryptoRate}
 											loadTitle={this._renderTitle}
 											fiat={fiat}
 										/>

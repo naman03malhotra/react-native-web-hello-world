@@ -52,7 +52,10 @@ const actions = {
 		INITIATE: 'WITHDRAW_INITIATE',
 		ADD_BANK: 'ADD_BANK',
 		SHOW_PROMPT: 'WITHDRAW_SHOW_PROMPT'
-	}
+  },
+  PASSBOOK: {
+    GET_DATA: 'PASSBOOK_GET_DATA'
+  }
 };
 
 export default actions;

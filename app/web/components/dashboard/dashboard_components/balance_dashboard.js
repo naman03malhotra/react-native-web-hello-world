@@ -148,7 +148,7 @@ class BalanceDashboard extends Component {
 										<ListItemText
 											className={classes.listSecondaryItem}
 											primary={userData.balanceFiat.toFixed(2)}
-											secondary={userData.countryCode}
+											secondary={fiat.toUpperCase()}
 										/>
 									</ListItemSecondaryAction>
 								</ListItem>

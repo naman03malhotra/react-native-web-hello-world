@@ -66,9 +66,9 @@ function TabContainer(props) {
 		<div style={{ padding: AppTheme.spaceExtraBig }}>
 			<Grid container spacing={24}>
 				<Hidden xsDown>
-					<Grid item xs={3} />
+					<Grid item xs={4} />
 				</Hidden>
-				<Grid item xs={12} sm={6}>
+				<Grid item xs={12} sm={4}>
 					{props.children}
 				</Grid>
 			</Grid>

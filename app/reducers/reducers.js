@@ -4,8 +4,9 @@ import signUpForm from './signup_form_reducer';
 import dashboard from './dashboard_reducer';
 import trade from './trade_reducer';
 import addMoney from './add_money_reducer';
-import withdraw from './withdraw_form_reducer';
 import send from './send_reducer';
+import withdraw from './withdraw_form_reducer';
+import passbook from './passbook_reducer';
 
 const combineReducer = combineReducers({
   appLoad,
@@ -14,7 +15,8 @@ const combineReducer = combineReducers({
   trade,
   addMoney,
   send,
-  withdraw
+  withdraw,
+  passbook
 });
 
 const appReducer = combineReducers({

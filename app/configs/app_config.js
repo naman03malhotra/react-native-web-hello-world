@@ -375,7 +375,8 @@ const MINIMUM = {
 		fee: 0.002
 	},
 	ADD_MONEY: {
-		inr: 5000
+		inr: 5000,
+		FEE: 0.2		
 	},
 	SEND: {
 		inr: 1,
@@ -384,7 +385,8 @@ const MINIMUM = {
 	WITHDRAW: {
 		inr: 5000
 	},
-	LENGTH: 10
+	LENGTH: 10,
+	COUNTRY_CODE: '+91'
 };
 
 const MODE = {

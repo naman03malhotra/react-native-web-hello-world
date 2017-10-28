@@ -115,7 +115,7 @@ class ActiveBids extends Component {
 					<div className={classes.textCenter}>
 						<CircularProgress
 							size={50}
-							thickness={0.5}
+							thickness={1}
 							className={classes.fabProgress}
 						/>
 					</div>

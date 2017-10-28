@@ -171,7 +171,9 @@ const dashboardActions = {
 						data: newData
 					});
 				} else {
-					newData.error = ERRORS.DASHBOARD.FAILED(res.body.errors[0]);
+					newData.error = ERRORS.DASHBOARD.FAILED(
+						JSON.stringify(res.body.errors[0])
+					);
 					dispatch({
 						type: ACTION.DASHBOARD.EXECUTE_INSTANT,
 						data: newData

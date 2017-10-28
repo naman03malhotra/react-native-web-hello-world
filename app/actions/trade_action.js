@@ -140,7 +140,9 @@ const tradeActions = {
 						data: newData
 					});
 				} else {
-					newData.error = ERRORS.DASHBOARD.FAILED(res.body.errors[0]); // FIX THIS JSON STRINGIGFY ALL
+					newData.error = ERRORS.DASHBOARD.FAILED(
+						JSON.stringify(res.body.errors[0])
+					);
 					dispatch({
 						type: ACTION.TRADE.INITIATE,
 						data: newData
