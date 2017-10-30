@@ -69,7 +69,8 @@ class Trade extends Component {
 		location: PropTypes.object
 	};
 	state = {
-		index: 0,
+		index1: 0,
+		index2: 0,
 		cryptoGridValue: 0,
 		isReady: false,
 		snackMsg: null
@@ -77,17 +78,23 @@ class Trade extends Component {
 	componentWillMount() {
 		const { loadTitle, title } = this.props;
 		loadTitle(title);
-	}
-	componentDidMount() {
 		this.setState({ isReady: true });
 	}
-	_handleChange = (event, index) => {
-		if (index > 1) return;
-		this.setState({ index });
+	_handleChange1 = (event, index1) => {
+		if (index1 > 1) return;
+		this.setState({ index1 });
 	};
-	_handleChangeSwipe = index => {
-		if (index > 1) return;
-		this.setState({ index });
+	_handleChangeSwipe1 = index1 => {
+		if (index1 > 1) return;
+		this.setState({ index1 });
+	};
+	_handleChange2 = (event, index2) => {
+		if (index2 > 1) return;
+		this.setState({ index2 });
+	};
+	_handleChangeSwipe2 = index2 => {
+		if (index2 > 1) return;
+		this.setState({ index2 });
 	};
 	_cryptoHandleChange = (event, index) => {
 		if (index > 1) return;
@@ -99,15 +106,15 @@ class Trade extends Component {
 	};
 
 	_returnBTCGrid(crypto) {
-		const { index } = this.state;
+		const { index1, index2 } = this.state;
 		const { classes, ...all } = this.props;
 		return (
 			<Grid container spacing={24}>
 				<Grid item xs={12} sm={6}>
 					<AppBar position="static" color="default">
 						<Tabs
-							value={index}
-							onChange={this._handleChange}
+							value={index1}
+							onChange={this._handleChange1}
 							indicatorColor={AppTheme.colorPrimary}
 							textColor={AppTheme.colorPrimary}
 							fullWidth
@@ -117,7 +124,10 @@ class Trade extends Component {
 							<Tab label="Place Sell Bid" icon={<TrendingDown />} />
 						</Tabs>
 					</AppBar>
-					<SwipeableViews index={index} onChangeIndex={this._handleChangeSwipe}>
+					<SwipeableViews
+						index={index1}
+						onChangeIndex={this._handleChangeSwipe1}
+					>
 						<TabContainer>
 							<BidMain {...all} crypto={crypto} type="buy" />
 						</TabContainer>
@@ -129,8 +139,8 @@ class Trade extends Component {
 				<Grid item xs={12} sm={6}>
 					<AppBar position="static" color="default">
 						<Tabs
-							value={index}
-							onChange={this._handleChange}
+							value={index2}
+							onChange={this._handleChange2}
 							indicatorColor={AppTheme.colorPrimary}
 							textColor={AppTheme.colorPrimary}
 							fullWidth
@@ -140,7 +150,10 @@ class Trade extends Component {
 							<Tab label="Buy Orders" icon={<TrendingUp />} />
 						</Tabs>
 					</AppBar>
-					<SwipeableViews index={index} onChangeIndex={this._handleChangeSwipe}>
+					<SwipeableViews
+						index={index2}
+						onChangeIndex={this._handleChangeSwipe2}
+					>
 						<TabContainer>
 							<ActiveBids {...all} crypto={crypto} type="buy" />
 						</TabContainer>

@@ -87,7 +87,6 @@ class LandingPage extends Component {
 							<h2 className="text-bold">BUY AND SELL DIGITAL CURRENCY</h2>
 							<br />
 							<h4 id="texterX">
-								{' '}
 								Alconomy - The Alternate Economy <br /> is South Asia's easiest
 								way to buy and sell bitcoin.
 							</h4>
@@ -309,7 +308,7 @@ class LandingPage extends Component {
 							</div>
 						</div>
 					</footer>
-					<SignUp success={open} onRequestClose={this.handleRequestClose} />
+					<SignUp open={open} onRequestClose={this.handleRequestClose} />
 				</div>
 			</Provider>
 		);

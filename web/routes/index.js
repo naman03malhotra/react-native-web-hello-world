@@ -39,4 +39,8 @@ router.get('/settings', function(req, res, next) {
 	res.render('dashboard', { title: 'Settings' });
 });
 
+router.get('/standby', function(req, res, next) {
+	res.render('dashboard', { title: 'Stand By' });
+});
+
 module.exports = router;

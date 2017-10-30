@@ -1,6 +1,7 @@
 import ACTION from '../constants/constants';
 import { API } from '../configs/app_config';
 import APIManager from '../utils/APIManager';
+import { HandleCatch } from '../utils/helpers';
 import Store from '../utils/storage';
 
 const appLoadActions = {
@@ -21,7 +22,7 @@ const appLoadActions = {
 				});
 		};
 	},
-	loadUserData: data => {
+	loadUserData: (data, history = null) => {
 		const header = `Bearer ${data}`;
 		return dispatch => {
 			return APIManager.getData(API.fetchUser, null, header)
@@ -37,6 +38,7 @@ const appLoadActions = {
 					});
 				})
 				.catch(err => {
+					HandleCatch(err, history);
 					dispatch({
 						type: ACTION.APP.APP_ERROR,
 						data: err
@@ -50,11 +52,11 @@ const appLoadActions = {
 				const rateData = {
 					btc: res.body.result
 				};
-				Store.save({
-					key: 'cryptoRate',
-					data: rateData,
-					expires: null
-				});
+				// Store.save({
+				// 	key: 'cryptoRate',
+				// 	data: rateData,
+				// 	expires: null
+				// });
 				dispatch({
 					type: ACTION.APP.LOAD_RATE,
 					data: rateData

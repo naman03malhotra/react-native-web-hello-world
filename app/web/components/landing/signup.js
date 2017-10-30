@@ -37,16 +37,16 @@ const styles = theme => ({
 class SignUp extends Component {
 	static propTypes = {
 		classes: PropTypes.object.isRequired,
-		success: PropTypes.bool.isRequired,
+		open: PropTypes.bool.isRequired,
 		onRequestClose: PropTypes.func.isRequired
 	};
 
 	render() {
-		const { classes, success, onRequestClose } = this.props;
+		const { classes, open, onRequestClose } = this.props;
 		return (
 			<Dialog
 				fullScreen
-				open={success}
+				open={open}
 				onRequestClose={onRequestClose}
 				transition={<Slide direction="up" />}
 			>
@@ -80,9 +80,5 @@ class SignUp extends Component {
 		);
 	}
 }
-
-SignUp.propTypes = {
-	classes: PropTypes.object.isRequired
-};
 
 export default withStyles(styles)(SignUp);

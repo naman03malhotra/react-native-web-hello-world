@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import { withStyles } from 'material-ui/styles';
 import Drawer from 'material-ui/Drawer';
 import AppBar from 'material-ui/AppBar';
@@ -14,7 +15,8 @@ import Divider from 'material-ui/Divider';
 import MenuIcon from 'material-ui-icons/Menu';
 import SvgIcon from 'material-ui/SvgIcon';
 import classNames from 'classnames';
-
+import { Swipeable } from 'react-touch';
+import ArrowLeft from 'material-ui-icons/ArrowBack';
 import AppTheme from '../../../theme/variables';
 import { incomingTransactions, outgoingTransactions, settings } from './routes';
 
@@ -81,6 +83,17 @@ const styles = theme => ({
 	list: {
 		paddingTop: AppTheme.spaceBig,
 		paddingBottom: AppTheme.spaceBig
+	},
+	styleHeaderIcon: {
+		color: AppTheme.colorWhite
+	},
+	styleHeaderTitle: {
+		color: AppTheme.colorWhite,
+		fontSize: AppTheme.spacingUnit * 3
+	},
+	image: {
+		height: AppTheme.spacingUnit * 6,
+    marginTop: AppTheme.spacingUnit
 	}
 });
 
@@ -115,7 +128,9 @@ class Main extends Component {
 	static propTypes = {
 		classes: PropTypes.object.isRequired
 	};
-
+	_handleSwipe = val => {
+		this.setState({ mobileOpen: val });
+	};
 	handleDrawerToggle = () => {
 		this.setState({ mobileOpen: !this.state.mobileOpen });
 	};
@@ -132,9 +147,24 @@ class Main extends Component {
 		const drawer = (
 			<div onClick={this.handleDrawerToggle}>
 				<div className={classNames(classes.drawerHeader, classes.colorPrimary)}>
-					<Typography type="headline" className={classes.drawerTitle}>
-						Alconomy
-					</Typography>
+					<Hidden mdUp>
+						<ListItem>
+							<ListItemIcon>
+								<ArrowLeft className={classes.styleHeaderIcon} />
+							</ListItemIcon>
+							<ListItemText
+								primary="Alconomy"
+								className={classes.styleHeaderTitle}
+								disableTypography
+							/>
+						</ListItem>
+					</Hidden>
+					<Hidden smDown>
+						<img
+							src="/images/logo/alco-plain-wt.png"
+							className={classes.image}
+						/>
+					</Hidden>
 				</div>
 				<List className={classes.list}>{incomingTransactions}</List>
 				<Divider />
@@ -145,52 +175,57 @@ class Main extends Component {
 		);
 
 		return (
-			<div className={classes.root}>
-				<div className={classes.appFrame}>
-					<AppBar className={classes.appBar}>
-						<Toolbar>
-							<IconButton
-								color="contrast"
-								aria-label="open drawer"
-								onClick={this.handleDrawerToggle}
-								className={classes.navIconHide}
+			<Swipeable
+				onSwipeLeft={() => this._handleSwipe(false)}
+				onSwipeRight={() => this._handleSwipe(true)}
+			>
+				<div className={classes.root}>
+					<div className={classes.appFrame}>
+						<AppBar className={classes.appBar}>
+							<Toolbar>
+								<IconButton
+									color="contrast"
+									aria-label="open drawer"
+									onClick={this.handleDrawerToggle}
+									className={classes.navIconHide}
+								>
+									<MenuIcon />
+								</IconButton>
+								<Typography type="title" color="inherit" noWrap>
+									{title}
+								</Typography>
+							</Toolbar>
+						</AppBar>
+						<Hidden mdUp>
+							<Drawer
+								type="temporary"
+								open={this.state.mobileOpen}
+								classes={{
+									paper: classes.drawerPaper
+								}}
+								onRequestClose={this.handleDrawerToggle}
+								ModalProps={{
+									keepMounted: true // Better open performance on mobile.
+								}}
 							>
-								<MenuIcon />
-							</IconButton>
-							<Typography type="title" color="inherit" noWrap>
-								{title}
-							</Typography>
-						</Toolbar>
-					</AppBar>
-					<Hidden mdUp>
-						<Drawer
-							type="temporary"
-							open={this.state.mobileOpen}
-							classes={{
-								paper: classes.drawerPaper
-							}}
-							onRequestClose={this.handleDrawerToggle}
-							ModalProps={{
-								keepMounted: true // Better open performance on mobile.
-							}}
-						>
-							{drawer}
-						</Drawer>
-					</Hidden>
-					<Hidden mdDown implementation="css">
-						<Drawer
-							type="permanent"
-							open
-							classes={{
-								paper: classes.drawerPaper
-							}}
-						>
-							{drawer}
-						</Drawer>
-					</Hidden>
-					<main className={classes.content}>{this.props.children}</main>
+								{drawer}
+							</Drawer>
+						</Hidden>
+						<Hidden mdDown implementation="css">
+							<Drawer
+								type="permanent"
+								open
+								classes={{
+									paper: classes.drawerPaper
+								}}
+							>
+								{drawer}
+							</Drawer>
+						</Hidden>
+						<main className={classes.content}>{this.props.children}</main>
+					</div>
 				</div>
-			</div>
+			</Swipeable>
 		);
 	}
 }

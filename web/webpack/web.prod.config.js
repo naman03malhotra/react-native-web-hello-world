@@ -1,7 +1,9 @@
 const path = require('path');
 const webpack = require('webpack');
 const UglifyJS = require('uglifyjs-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const bundleName = 'bundle-' + Date.now() + '.js';
 module.exports = {
 	entry: [path.join(__dirname, '../../app/web/index')],
 	output: {
@@ -9,7 +11,7 @@ module.exports = {
 			__dirname,
 			'../../../express-react-native-web/web/public/builds'
 		),
-		filename: 'bundle.js',
+		filename: bundleName,
 		publicPath: '/'
 	},
 	module: {
@@ -47,6 +49,30 @@ module.exports = {
 		}),
 		// optimizations
 		new webpack.optimize.OccurrenceOrderPlugin(),
+		new HtmlWebpackPlugin({
+			bundleName: bundleName,
+			template: path.join(
+				__dirname,
+				'../../../express-react-native-web/web/views/index_temp.html'
+			),
+			filename: path.join(
+				__dirname,
+				'../../../express-react-native-web/web/views/index.hjs'
+			),
+			inject: false
+		}),
+		new HtmlWebpackPlugin({
+			bundleName: bundleName,
+			template: path.join(
+				__dirname,
+				'../../../express-react-native-web/web/views/dashboard_temp.html'
+			),
+			filename: path.join(
+				__dirname,
+				'../../../express-react-native-web/web/views/dashboard.hjs'
+			),
+			inject: false			
+		}),
 		new UglifyJS({
 			uglifyOptions: {
 				warnings: false

@@ -58,8 +58,8 @@ class Dashboard extends Component {
 		index: 0
 	};
 	componentWillMount() {
-		const { loadTitle, title, appActions, access_token } = this.props;
-		loadTitle(title);
+		const { loadTitle, title, history, appActions, access_token } = this.props;
+		loadTitle(title, history);
 		// appActions.loadUserData(access_token);
 	}
 	_handleChange = (event, index) => {

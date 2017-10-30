@@ -8,7 +8,7 @@ import { CircularProgress } from 'material-ui/Progress';
 
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import firebase from '../components/common/firebase';
+// import firebase from '../components/common/firebase';
 
 import Main from '../components/dashboard/main';
 import Dashboard from '../components/dashboard/dashboard_components/dashboard';
@@ -19,6 +19,7 @@ import Receive from '../components/dashboard/receive/receive';
 import Withdraw from '../components/dashboard/withdraw/withdraw';
 import Passbook from '../components/dashboard/passbook/passbook';
 import Settings from '../components/dashboard/settings/settings';
+import StandBy from '../components/dashboard/settings/standby';
 import AppTheme from '../../theme/variables';
 
 const styles = theme => ({
@@ -30,7 +31,7 @@ const styles = theme => ({
 		zIndex: 1
 	}
 });
-const messaging = firebase.messaging();
+// const messaging = firebase.messaging();
 
 class App extends Component {
 	static propTypes = {
@@ -44,7 +45,8 @@ class App extends Component {
 	};
 	state = {
 		title: null,
-		isReady: false
+		isReady: false,
+		history: null
 	};
 	componentDidMount() {
 		const { app, appActions } = this.props;
@@ -58,7 +60,7 @@ class App extends Component {
 			appActions.loadUserData(access_token).then(() => {
 				appActions.loadRate().then(() => {
 					this.interval = setInterval(
-						() => appActions.loadUserData(access_token),
+						() => appActions.loadUserData(access_token, this.state.history),
 						4000
 					);
 					// this._registerFirebase();
@@ -113,9 +115,9 @@ class App extends Component {
 	// 		console.log(message);
 	// 	});
 	// };
-	_renderTitle = title => {
+	_renderTitle = (title, history = null) => {
 		document.title = title;
-		this.setState({ title });
+		this.setState({ title, history });
 	};
 	render() {
 		const { title, isReady } = this.state;
@@ -245,6 +247,18 @@ class App extends Component {
 											userData={app.userData}
 											loadTitle={this._renderTitle}
 											fiat={fiat}
+										/>
+									)}
+								/>
+								<Route
+									exact
+									path="/standby"
+									render={routeProps => (
+										<StandBy
+											{...routeProps}
+											title="Stand By"
+											access_token={app.initialLoad.access_token}
+											userData={app.userData}
 										/>
 									)}
 								/>

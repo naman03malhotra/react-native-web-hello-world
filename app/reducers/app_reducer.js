@@ -35,7 +35,7 @@ const appError = (state = null, action) => {
 				text: action.data,
 				json: JSON.parse(JSON.stringify(action.data))
 			};
-			HandleCatch(action.data);
+			// HandleCatch(action.data);
 			return Object.assign({}, state, error);
 	}
 	return state;

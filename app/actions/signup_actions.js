@@ -5,6 +5,31 @@ import APIManager from '../utils/APIManager';
 import Store from '../utils/storage';
 
 const signUpActions = {
+	authExistingToken: () => {
+		const newData = {};
+		return dispatch => {
+			return Store.load({
+				key: 'userAuth'
+			})
+				.then(res => res.access_token)
+				.then(access_token => {
+					const header = `Bearer ${access_token}`;
+					return APIManager.getData(API.fetchUser, null, header).then(res => {
+						if (res) newData.authStatus = 1;
+						dispatch({
+							type: ACTION.SIGNUP.EXISTING_AUTH,
+							data: newData
+						});
+					});
+				})
+				.catch(err => {
+					dispatch({
+						type: ACTION.SIGNUP.EXISTING_AUTH,
+						data: newData
+					});
+				});
+		};
+	},
 	signUp: data => {
 		return dispatch => {
 			return APIManager.postData(API.signup, data, null)
@@ -42,6 +67,10 @@ const signUpActions = {
 			client_id: CLIENT.client_id,
 			client_secret: CLIENT.client_secret
 		};
+		const mobileData = {
+			mobileNumber: data.mobile,
+			countryCode: COUNTRY_CODE.ind.code
+		};
 		return dispatch => {
 			return APIManager.postData(API.signin, dataToSend, null)
 				.then(res => {
@@ -49,6 +78,11 @@ const signUpActions = {
 						Store.save({
 							key: 'userAuth',
 							data: res.body,
+							expires: null
+						});
+						Store.save({
+							key: 'mobile',
+							data: mobileData,
 							expires: null
 						});
 						dispatch({
