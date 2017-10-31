@@ -27,6 +27,9 @@ const styles = theme => ({
 	receiveDetails: {
 		borderTop: `0.5px solid ${theme.palette.grey['500']}`,
 		marginTop: AppTheme.spacingUnit
+	},
+	addressContainer: {
+		marginTop: AppTheme.spacingUnit
 	}
 });
 
@@ -62,12 +65,12 @@ class ReceiveMain extends Component {
 						value={addressValue}
 					/>
 				</div>
-				<Grid container>
+				<Grid container className={classes.addressContainer}>
 					<Hidden xsDown>
 						<Grid item xs={3} />
 					</Hidden>
 					<Grid item xs={12} sm={6}>
-						<Typography type="caption">{addressValue}</Typography>
+						<Typography>{addressValue}</Typography>
 						<Typography className={classes.receiveDetails}>
 							{`Share your ${mode === 'fiat'
 								? 'Mobile Number'

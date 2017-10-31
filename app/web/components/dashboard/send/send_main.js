@@ -241,7 +241,7 @@ class SendMain extends Component {
 					</Typography>
 				</div>
 				<CustomTextInput
-					label={`Sender's Mobile Number ${mode === 'crypto'
+					label={`Mobile Number ${mode === 'crypto'
 						? `or ${crypto.toUpperCase()} address`
 						: ''}`}
 					type={mode === 'fiat' ? 'text' : 'text'}

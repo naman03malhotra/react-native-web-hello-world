@@ -22,6 +22,11 @@ const styles = {
 	textDecoration: 'none',
 	color: AppTheme.colorPrimary
 };
+const _handleLogout = () => {
+	if (confirm('Proceed to logging out?')) {
+		Logout();
+	}
+};
 
 export const incomingTransactions = (
 	<div>
@@ -99,7 +104,7 @@ export const settings = (
 				<ListItemText primary="Settings" />
 			</ListItem>
 		</Link>
-		<a onClick={Logout} style={styles}>
+		<a onClick={_handleLogout} style={styles}>
 			<ListItem button>
 				<ListItemIcon>
 					<ArrowBack />
