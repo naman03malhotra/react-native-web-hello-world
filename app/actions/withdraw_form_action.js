@@ -28,10 +28,10 @@ const withdrawActions = {
 		} else if (userData.bankDetails.length === 0) {
 			newData.error = ERRORS.WITHDRAW.BANK;
 		} else {
-      newData.error = ERRORS.WITHDRAW.CONFIRM(
-        `${data.amount} ${fiat.toUpperCase()}`
-      );
-    }
+			newData.error = ERRORS.WITHDRAW.CONFIRM(
+				`${data.amount} ${fiat.toUpperCase()}`
+			);
+		}
 		return {
 			type: ACTION.WITHDRAW.VALIDATE_DATA,
 			data: newData
@@ -70,26 +70,22 @@ const withdrawActions = {
 			).then(res => {
 				newData.loading = false;
 				if (res.body.status === 1) {
-          newData.status = res.body.status;
-          newData.error = ERRORS.WITHDRAW.SUCCESS;
-					dispatch({
-						type: ACTION.WITHDRAW.INITIATE,
-						data: newData
-					});
+					newData.status = res.body.status;
+					newData.error = ERRORS.WITHDRAW.SUCCESS;
 				} else {
 					newData.status = res.body.status;
 					newData.error = ERRORS.DASHBOARD.FAILED(
 						JSON.stringify(res.body.errors[0])
 					);
-					dispatch({
-						type: ACTION.ADD_MONEY.VALIDATE_PAYMENT_REFDATA,
-						data: newData
-					});
 				}
+				dispatch({
+					type: ACTION.WITHDRAW.INITIATE,
+					data: newData
+				});
 			});
 		};
-  },
-  addBank: (data, userData, access_token) => {
+	},
+	addBank: (data, userData, access_token) => {
 		const header = `Bearer ${access_token}`;
 		const dataToSend = data;
 		const newData = {

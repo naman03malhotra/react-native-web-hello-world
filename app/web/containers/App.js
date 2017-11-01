@@ -40,9 +40,6 @@ class App extends Component {
 		classes: PropTypes.object.isRequired,
 		fiat: PropTypes.string
 	};
-	static defaultProps = {
-		fiat: 'inr'
-	};
 	state = {
 		title: null,
 		isReady: false,
@@ -121,7 +118,7 @@ class App extends Component {
 	};
 	render() {
 		const { title, isReady } = this.state;
-		const { app, classes, fiat, appActions } = this.props;
+		const { app, classes, appActions } = this.props;
 		// console.log(this.props);
 		return (
 			<div className="react-native-web">
@@ -146,7 +143,7 @@ class App extends Component {
 											userData={app.userData}
 											cryptoRate={app.cryptoRate}
 											loadTitle={this._renderTitle}
-											fiat={fiat}
+											fiat={app.userData.currencyCode}
 											appActions={appActions}
 										/>
 									)}
@@ -162,7 +159,7 @@ class App extends Component {
 											userData={app.userData}
 											cryptoRate={app.cryptoRate}
 											loadTitle={this._renderTitle}
-											fiat={fiat}
+											fiat={app.userData.currencyCode}
 										/>
 									)}
 								/>
@@ -176,7 +173,7 @@ class App extends Component {
 											access_token={app.initialLoad.access_token}
 											userData={app.userData}
 											loadTitle={this._renderTitle}
-											fiat={fiat}
+											fiat={app.userData.currencyCode}
 										/>
 									)}
 								/>
@@ -190,7 +187,7 @@ class App extends Component {
 											access_token={app.initialLoad.access_token}
 											userData={app.userData}
 											loadTitle={this._renderTitle}
-											fiat={fiat}
+											fiat={app.userData.currencyCode}
 										/>
 									)}
 								/>
@@ -204,7 +201,7 @@ class App extends Component {
 											access_token={app.initialLoad.access_token}
 											userData={app.userData}
 											loadTitle={this._renderTitle}
-											fiat={fiat}
+											fiat={app.userData.currencyCode}
 										/>
 									)}
 								/>
@@ -218,7 +215,7 @@ class App extends Component {
 											access_token={app.initialLoad.access_token}
 											userData={app.userData}
 											loadTitle={this._renderTitle}
-											fiat={fiat}
+											fiat={app.userData.currencyCode}
 										/>
 									)}
 								/>
@@ -232,7 +229,7 @@ class App extends Component {
 											access_token={app.initialLoad.access_token}
 											userData={app.userData}
 											loadTitle={this._renderTitle}
-											fiat={fiat}
+											fiat={app.userData.currencyCode}
 										/>
 									)}
 								/>
@@ -246,7 +243,7 @@ class App extends Component {
 											access_token={app.initialLoad.access_token}
 											userData={app.userData}
 											loadTitle={this._renderTitle}
-											fiat={fiat}
+											fiat={app.userData.currencyCode}
 										/>
 									)}
 								/>

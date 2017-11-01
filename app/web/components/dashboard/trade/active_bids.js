@@ -59,11 +59,12 @@ class ActiveBids extends Component {
 		classes: PropTypes.object.isRequired
 	};
 	state = {
-		bidData: []
+		bidData: [],
+		loading: false
 	};
 	componentDidMount() {
 		this._loadBids();
-		// this.interval = setInterval(this._loadBids, 2000);
+		this.interval = setInterval(this._loadBids, 4000);
 	}
 	componentWillReceiveProps(props) {
 		const { type, crypto, access_token, trade, tradeActions } = props;
@@ -73,6 +74,10 @@ class ActiveBids extends Component {
 			try {
 				const { bidData } = inputData[crypto][type];
 				this.setState({ bidData });
+			} catch (err) {}
+			try {
+				const { loading } = inputData[crypto][type];
+				this.setState({ loading });
 			} catch (err) {}
 		}
 	}
@@ -96,7 +101,7 @@ class ActiveBids extends Component {
 		});
 	};
 	render() {
-		const { bidData } = this.state;
+		const { bidData, loading } = this.state;
 		const { classes, crypto, fiat } = this.props;
 		return (
 			<div className={classes.paper}>
@@ -113,11 +118,15 @@ class ActiveBids extends Component {
 					</Table>
 				) : (
 					<div className={classes.textCenter}>
-						<CircularProgress
-							size={50}
-							thickness={1}
-							className={classes.fabProgress}
-						/>
+						{loading ? (
+							<CircularProgress
+								size={50}
+								thickness={1}
+								className={classes.fabProgress}
+							/>
+						) : (
+							<Typography>No Active bids</Typography>
+						)}
 					</div>
 				)}
 			</div>

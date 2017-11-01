@@ -164,7 +164,7 @@ class Send extends Component {
 								<SendMain {...all} mode="crypto" crypto="btc" />
 							</TabContainer>
 							<TabContainer>
-								<SendETH />
+							<SendMain {...all} mode="crypto" crypto="eth" />
 							</TabContainer>
 						</SwipeableViews>
 					</Grid>

@@ -180,6 +180,9 @@ class Passbook extends Component {
 											<TableCell>Info</TableCell>
 											<TableCell>Date</TableCell>
 											<TableCell numeric>
+												Fee ({fiat.toUpperCase()})
+											</TableCell>
+											<TableCell numeric>
 												Total ({fiat.toUpperCase()})
 											</TableCell>
 											<TableCell numeric>Total Crypto</TableCell>
@@ -204,16 +207,18 @@ class Passbook extends Component {
 													<TableCell>{n.narration}</TableCell>
 													<TableCell>{date}</TableCell>
 													<TableCell numeric>
-														{`${n.balance[fiatUp].txnAmount}`}
+														{`${n.fee}`}
 													</TableCell>
 													<TableCell numeric>
-														{n.balance.BTC.txnAmount !== 0
-															? `${n.balance.BTC.txnAmount} BTC`
-															: n.balance.ETH.txnAmount !== 0
-																? `${n.balance.ETH.txnAmount} ETH`
+														{`${n.fiatTxnAmount}`}
+													</TableCell>
+													<TableCell numeric>
+														{n.btcTxnAmount !== 0
+															? `${n.btcTxnAmount} BTC`
+															: n.ethTxnAmount !== 0
+																? `${n.ethTxnAmount} ETH`
 																: '-'}
 													</TableCell>
-													<TableCell numeric>{n.crypto}</TableCell>
 												</TableRow>
 											);
 										})}
@@ -233,7 +238,7 @@ class Passbook extends Component {
 											className={classes.fabProgress}
 										/>
 									) : (
-										<Typography type="headline">No Active Orders</Typography>
+										<Typography type="headline">No Transactions to show</Typography>
 									)}
 								</div>
 							)}

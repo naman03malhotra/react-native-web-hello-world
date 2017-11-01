@@ -94,8 +94,8 @@ class Dashboard extends Component {
 							<InstantBuy {...all} crypto="btc" type="sell" />
 						</TabContainer>
 						<TabContainer>
-							<InstantBuy {...all} crypto="btc" type="buy" />
-							<InstantBuy {...all} crypto="btc" type="sell" />
+							<InstantBuy {...all} crypto="eth" type="buy" />
+							<InstantBuy {...all} crypto="eth" type="sell" />
 						</TabContainer>
 					</SwipeableViews>
 				</Grid>

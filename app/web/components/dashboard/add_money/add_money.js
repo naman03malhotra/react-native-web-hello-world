@@ -122,8 +122,8 @@ class AddMoney extends Component {
 					this.setState({ success: true, stage: 0 });
 				} else if (status === 2) {
 					addMoneyActions.inputReference(transaction.paymentReference);
-					addMoneyActions.amountInput(transaction.balance['INR'].txnAmount); ///////////// FIX THIS.
-					this.setState({ success: true, stage: 2 });
+					addMoneyActions.amountInput(transaction.fiatTxnAmount);
+					this.setState({ success: true, stage: status });
 				} else {
 					this.setState({ error });
 				}
@@ -208,7 +208,7 @@ class AddMoney extends Component {
 		return (
 			<div>
 				<Grid container spacing={24}>
-					{snackMsg && ( ///////////// FIX THIS.
+					{snackMsg && (
 						<SnackBar
 							message={snackMsg.message}
 							open

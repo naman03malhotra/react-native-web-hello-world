@@ -24,8 +24,7 @@ const sendActions = {
 		const newData = { error: null };
 		let totalCrypto = null;
 		if (mode === 'crypto') {
-			totalCrypto =
-				userData[crypto].balanceReal + userData[crypto].balanceVirtual;
+			totalCrypto = userData[crypto].balance;
 		}
 		const minAmtCrypto = MINIMUM.SEND[crypto];
 		const minAddressLength = MINIMUM.LENGTH;

@@ -106,10 +106,9 @@ class Otp extends React.Component {
 	render() {
 		const { open, handleRequestClose, classes, loading } = this.props;
 		const { message, goodmsg, otp } = this.state;
-		const openSnack = message !== null ? true : false;
 		return (
 			<div>
-				{openSnack && ( ///////////// FIX THIS.
+				{message && (
 					<SnackBar
 						message={message}
 						open

@@ -62,7 +62,7 @@ class BidMain extends Component {
 		const { type, crypto, fiat, cryptoRate } = this.props;
 		const cryptoError = ERRORS.TRADE.DEFAULT(mode.CRYPTO, type, crypto);
 		const fiatError = ERRORS.TRADE.DEFAULT(mode.FIAT, type, crypto);
-		const fiatAmt = cryptoRate[crypto][type];
+		const fiatAmt = cryptoRate[crypto][type] || '';
 		this.setState({ cryptoError, fiatError, fiatAmt });
 	}
 	componentWillReceiveProps(props) {
@@ -122,7 +122,8 @@ class BidMain extends Component {
 		const data = {
 			volume: cryptoAmt,
 			price: fiatAmt,
-			total
+			total,
+			crypto
 		};
 		const { error } = tradeActions.validateData(
 			userData,
@@ -169,6 +170,8 @@ class BidMain extends Component {
 			.then(() => {
 				const { error } = this.props.trade.manageAmount;
 				const { status } = this.state;
+				const dataToSend = { skip: 0, crypto };
+				tradeActions.getActiveOrders(dataToSend, crypto, access_token, []);
 				if (status === 1 || status === 2 || status === 3) {
 					error.closeButtonText = 'close';
 					error.mainButtonText = 'Check Passbook';
@@ -199,8 +202,7 @@ class BidMain extends Component {
 		} else {
 			total = cryptoAmt * fiatAmt - fee;
 		}
-		const totalCrypto =
-			userData[crypto].balanceReal + userData[crypto].balanceVirtual;
+		const totalCrypto = userData[crypto].balance;
 		return (
 			<Grid container spacing={24}>
 				{error && (
@@ -217,8 +219,10 @@ class BidMain extends Component {
 				<Grid item xs={12} className={classes.gridStyle}>
 					<Typography>
 						{type === 'buy'
-							? `${fiat.toUpperCase()} Balance: ${userData.balanceFiat}`
-							: `${crypto.toUpperCase()} Balance: ${totalCrypto}`}
+							? `${fiat.toUpperCase()} Balance: ${userData.balanceFiat.toFixed(
+									2
+								)}`
+							: `${crypto.toUpperCase()} Balance: ${totalCrypto.toFixed(8)}`}
 					</Typography>
 				</Grid>
 				<Grid item xs={6} className={classes.gridStyle}>

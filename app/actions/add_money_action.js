@@ -9,7 +9,6 @@ const sendPendingTransaction = (dispatch, newData, header) => {
 		null,
 		header
 	).then(res => {
-		newData.status = 2;
 		newData.transaction = res.body.result;
 		newData.error = ERRORS.ADD_MONEY.SNACK_SUCCESS_UPDATE;
 		dispatch({
@@ -69,8 +68,7 @@ const addMoneyActions = {
 						type: ACTION.ADD_MONEY.INITIATE,
 						data: newData
 					});
-				} else if (res.body.status === 0) {
-					/// FIX THIS to status 2
+				} else if (res.body.status === 2) {
 					return sendPendingTransaction(dispatch, newData, header);
 				} else {
 					newData.error = ERRORS.DASHBOARD.FAILED(

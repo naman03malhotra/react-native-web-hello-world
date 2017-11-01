@@ -8,15 +8,37 @@ const tradeActions = {
 		const header = `Bearer ${access_token}`;
 		const api = API.getBids[type];
 		const newData = {};
+		const dataToSend = {
+			crypto
+		};
+		newData.inputData = {
+			[crypto]: {
+				[type]: {
+					loading: true
+				}
+			}
+		};
 		return dispatch => {
-			return APIManager.getData(api, null, header).then(res => {
-				newData.inputData = {
-					[crypto]: {
-						[type]: {
-							bidData: res.body.result
+			return APIManager.getData(api, dataToSend, header).then(res => {
+				if (res.body.status === 1) {
+					newData.inputData = {
+						[crypto]: {
+							[type]: {
+								bidData: res.body.result,
+								loading: false
+							}
 						}
-					}
-				};
+					};
+				} else {
+					newData.inputData = {
+						[crypto]: {
+							[type]: {
+								bidData: [],
+								loading: false
+							}
+						}
+					};
+				}
 				dispatch({
 					type: ACTION.TRADE.LOAD_BIDS,
 					data: newData
@@ -36,7 +58,7 @@ const tradeActions = {
 			data = '';
 		} else if (data < minAmt && mode === MODE.CRYPTO) {
 			error = ERRORS.TRADE.MIN_AMT(minAmt, crypto);
-		} else if ((data < min || data > max) && mode === MODE.FIAT) {
+		} else if ((data < min || data > max) && mode === MODE.FIAT && rate !== null) {
 			error = ERRORS.TRADE.PRICE_DIFFERENCE;
 		} else {
 			error = ERRORS.TRADE.DEFAULT(mode, type, crypto);
@@ -76,8 +98,7 @@ const tradeActions = {
 		const newData = {
 			error: null
 		};
-		const totalCrypto =
-			userData[crypto].balanceReal + userData[crypto].balanceVirtual;
+		const totalCrypto = userData[crypto].balance;
 
 		if (
 			(userData.balanceFiat === 0 && type === 'buy') ||
@@ -181,8 +202,8 @@ const tradeActions = {
 				});
 			});
 		};
-  },
-  cancelPrompt: (number) => {
+	},
+	cancelPrompt: number => {
 		const newData = {
 			error: null
 		};
@@ -191,19 +212,15 @@ const tradeActions = {
 			type: ACTION.WITHDRAW.SHOW_PROMPT,
 			data: newData
 		};
-  },
-  cancelActiveOrders: (data, access_token) => {
-    const header = `Bearer ${access_token}`;
+	},
+	cancelActiveOrders: (data, access_token) => {
+		const header = `Bearer ${access_token}`;
 		const newData = {
 			status: 0
 		};
 		return dispatch => {
-			return APIManager.postData(
-				API.cancelBuyerBid,
-				data,
-				header
-			).then(res => {
-				if (res.body.status !== 1) {
+			return APIManager.postData(API.cancelBid, data, header).then(res => {
+				if (res.body.status === 1) {
 					newData.status = res.body.status;
 					newData.error = ERRORS.TRADE.SNACK_CANCEL;
 					dispatch({
@@ -221,7 +238,7 @@ const tradeActions = {
 				}
 			});
 		};
-  }
+	}
 };
 
 export default tradeActions;

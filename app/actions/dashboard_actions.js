@@ -13,7 +13,7 @@ const convertFiat = (input, rate, mode, type, crypto) => {
 				[type]: {
 					['fiat']: {
 						amt: data,
-						rate: rate
+						rate
 					},
 					loading: false
 				}
@@ -26,7 +26,7 @@ const convertFiat = (input, rate, mode, type, crypto) => {
 				[type]: {
 					['crypto']: {
 						amt: data,
-						rate: rate
+						rate
 					},
 					loading: false
 				}
@@ -67,11 +67,13 @@ const dashboardActions = {
 		}
 		if (mode === 'crypto') {
 			dataToSend = {
-				volume: input
+				volume: input,
+				crypto
 			};
 		} else if (mode === 'fiat') {
 			dataToSend = {
-				amount: input
+				amount: input,
+				crypto
 			};
 		}
 		newData.inputData = {
@@ -104,7 +106,7 @@ const dashboardActions = {
 			error: null
 		};
 		const totalCrypto =
-			userData[crypto].balanceReal + userData[crypto].balanceVirtual;
+			userData[crypto].balance;
 		const minAmtCrypto = (MINIMUM.DASHBOARD[crypto] / data.price).toFixed(3);
 		const minAmtFiat = MINIMUM.DASHBOARD[crypto];
 		if (

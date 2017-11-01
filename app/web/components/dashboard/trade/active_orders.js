@@ -73,7 +73,7 @@ class EnhancedTableHead extends React.Component {
 				disablePadding: true,
 				label: 'Txn ID'
 			},
-			{ id: 'Type', numeric: true, disablePadding: false, label: 'Type' },			
+			{ id: 'Type', numeric: true, disablePadding: false, label: 'Type' },
 			{ id: 'status', numeric: true, disablePadding: false, label: 'Status' },
 			{ id: 'Date', numeric: true, disablePadding: false, label: 'Date' },
 			{
@@ -294,16 +294,17 @@ class EnhancedTable extends React.Component {
 	_loadTransactions = () => {
 		const { data, skip } = this.state;
 		const { crypto, access_token, trade, tradeActions } = this.props;
-		const dataToSend = { skip };
+		const dataToSend = { skip, crypto };
 		tradeActions.getActiveOrders(dataToSend, crypto, access_token, data);
 	};
 
 	_initiateCancel = () => {
 		const { selected } = this.state;
-		const { tradeActions, access_token, setSnackMsg } = this.props;
+		const { tradeActions, access_token, setSnackMsg, crypto } = this.props;
 		const { error } = tradeActions.cancelPrompt(selected.length).data;
 		const dataToSend = {
-			ids: selected
+			ids: selected,
+			crypto
 		};
 		if (error.code === 1) {
 			error.closeButtonText = 'Cancel';
@@ -312,7 +313,7 @@ class EnhancedTable extends React.Component {
 				this._handleErrorRequestClose();
 				tradeActions.cancelActiveOrders(dataToSend, access_token).then(() => {
 					const { status, error } = this.props.trade.cancelActiveOrders;
-					if (status !== 1) {
+					if (status === 1) {
 						this.setState({ skip: 0, data: [], selected: [] });
 						this._loadTransactions();
 						setSnackMsg(error);
@@ -350,38 +351,47 @@ class EnhancedTable extends React.Component {
 	};
 
 	handleSelectAllClick = (event, checked) => {
+		const mappedSelected = [];
 		if (checked) {
-			this.setState({ selected: this.state.data.map(n => n.transactionId) });
+			this.state.data.forEach(n => {
+				if (n.status === 'PENDING') {
+					mappedSelected.push(n.transactionId);
+				}
+			});
+			this.setState({
+				selected: mappedSelected
+			});
 			return;
 		}
 		this.setState({ selected: [] });
 	};
 
-	handleKeyDown = (event, id) => {
+	handleKeyDown = (event, id, status) => {
 		if (keycode(event) === 'space') {
-			this.handleClick(event, id);
+			this.handleClick(event, id, status);
 		}
 	};
 
-	handleClick = (event, id) => {
+	handleClick = (event, id, status) => {
 		const { selected } = this.state;
 		const selectedIndex = selected.indexOf(id);
 		let newSelected = [];
+		if (status === 'PENDING') {
+			if (selectedIndex === -1) {
+				newSelected = newSelected.concat(selected, id);
+			} else if (selectedIndex === 0) {
+				newSelected = newSelected.concat(selected.slice(1));
+			} else if (selectedIndex === selected.length - 1) {
+				newSelected = newSelected.concat(selected.slice(0, -1));
+			} else if (selectedIndex > 0) {
+				newSelected = newSelected.concat(
+					selected.slice(0, selectedIndex),
+					selected.slice(selectedIndex + 1)
+				);
+			}
 
-		if (selectedIndex === -1) {
-			newSelected = newSelected.concat(selected, id);
-		} else if (selectedIndex === 0) {
-			newSelected = newSelected.concat(selected.slice(1));
-		} else if (selectedIndex === selected.length - 1) {
-			newSelected = newSelected.concat(selected.slice(0, -1));
-		} else if (selectedIndex > 0) {
-			newSelected = newSelected.concat(
-				selected.slice(0, selectedIndex),
-				selected.slice(selectedIndex + 1)
-			);
+			this.setState({ selected: newSelected });
 		}
-
-		this.setState({ selected: newSelected });
 	};
 
 	handleChangePage = (event, page) => {
@@ -451,9 +461,9 @@ class EnhancedTable extends React.Component {
 										<TableRow
 											hover
 											onClick={event =>
-												this.handleClick(event, n.transactionId)}
+												this.handleClick(event, n.transactionId, n.status)}
 											onKeyDown={event =>
-												this.handleKeyDown(event, n.transactionId)}
+												this.handleKeyDown(event, n.transactionId, n.status)}
 											role="checkbox"
 											aria-checked={isSelected}
 											tabIndex={-1}
@@ -466,10 +476,14 @@ class EnhancedTable extends React.Component {
 											})}
 										>
 											<TableCell padding="checkbox">
-												<Checkbox checked={isSelected} />
+												{n.status === 'PENDING' ? (
+													<Checkbox checked={isSelected} />
+												) : (
+													''
+												)}
 											</TableCell>
 											<TableCell padding="none">{n.transactionId}</TableCell>
-											<TableCell numeric>{n.mode}</TableCell>										
+											<TableCell numeric>{n.mode}</TableCell>
 											<TableCell numeric>{n.status}</TableCell>
 											<TableCell numeric>{date}</TableCell>
 											<TableCell numeric>{n.volume}</TableCell>
@@ -498,34 +512,30 @@ class EnhancedTable extends React.Component {
 							)}
 						</div>
 					)}
-				
 				</div>
 				{data.length > 0 ? (
-						<div className={classes.textCenter}>
-							{skip !== -1 ? (
-								<Button
-									raised
-									color="primary"
-									disabled={loading}
-									className={classes.button}
-									onClick={this._loadTransactions}
-								>
-									{!loading ? (
-										'Load More'
-									) : (
-										<CircularProgress
-											size={24}
-											className={classes.fabProgress}
-										/>
-									)}
-								</Button>
-							) : (
-								<Button color="primary">All orders are loaded</Button>
-							)}
-						</div>
-					) : (
-						''
-					)}
+					<div className={classes.textCenter}>
+						{skip !== -1 ? (
+							<Button
+								raised
+								color="primary"
+								disabled={loading}
+								className={classes.button}
+								onClick={this._loadTransactions}
+							>
+								{!loading ? (
+									'Load More'
+								) : (
+									<CircularProgress size={24} className={classes.fabProgress} />
+								)}
+							</Button>
+						) : (
+							<Button color="primary">All orders are loaded</Button>
+						)}
+					</div>
+				) : (
+					''
+				)}
 			</div>
 		);
 	}

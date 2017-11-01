@@ -7,7 +7,7 @@ const API = {
 	fetchUser: `http://${serverIp}/api/userinfo`,
 	updateUser: `http://${serverIp}/api/user/update`,
 	//landing
-	currentBTCPrice: `http://${serverIp}/api/bid/currentBTCPrice`,
+	currentPrice: `http://${serverIp}/api/currentPrice`,
 	//Trading
 	createBid: {
 		buy: `http://${serverIp}/api/bid/buyer/create`,
@@ -18,12 +18,12 @@ const API = {
 		sell: `http://${serverIp}/api/bid/buyer/get`
 	},
 	getActiveOrders: `http://${serverIp}/api/bid/history`,
-	cancelBuyerBid: `http://${serverIp}/api/bid/buyer/cancel`,
-	cancelSellerBid: `http://${serverIp}/api/bid/seller/cancel`,
+	cancelBid: `http://${serverIp}/api/bid/cancel`,
+	// cancelSellerBid: `http://${serverIp}/api/bid/seller/cancel`,
 	//instant buy / Dashboard
 	getInstantPrice: {
-		buy: `http://${serverIp}/api/bid/getInstantBuyingPrice`,
-		sell: `http://${serverIp}/api/bid/getInstantSellingPrice`
+		buy: `http://${serverIp}/api/buyingPrice`,
+		sell: `http://${serverIp}/api/sellingPrice`
 	},
 	instant: {
 		buy: `http://${serverIp}/api/bid/instantBuy`,
@@ -44,7 +44,7 @@ const API = {
 	//send
 	send: {
 		fiat: `http://${serverIp}/api/fiat/send`,
-		crypto: `http://${serverIp}/api/btc/send`
+		crypto: `http://${serverIp}/api/crypto/send`
 	}
 };
 
@@ -66,7 +66,11 @@ const ERRORS = {
 	SIGNUP: {
 		MOBILE_LENGTH: {
 			title: 'Invalid Mobile Number',
-			message: 'Mobile number length should be 10 digits'
+			message: 'Given mobile number length is too short'
+		},
+		COUNTRY_NOT_PRESENT: {
+			title: 'Select Country',
+			message: 'Please select a country'
 		}
 	},
 	DASHBOARD: {
@@ -376,7 +380,7 @@ const MINIMUM = {
 	},
 	ADD_MONEY: {
 		inr: 5000,
-		FEE: 0.2		
+		FEE: 0.2
 	},
 	SEND: {
 		inr: 1,
@@ -394,4 +398,22 @@ const MODE = {
 	CRYPTO: 'crypto'
 };
 
-export { API, COUNTRY_CODE, CLIENT, ERRORS, MINIMUM, MODE };
+const COUNTRIES = {
+	inr: {
+		countryCode: '+91',
+		currencyName: 'Indian Rupee',
+		countryName: 'India'
+	},
+	aed: {
+		countryCode: '+971',
+		currencyName: 'Dirham',
+		countryName: 'United Arab Emirates'
+	},
+	default: {
+		countryCode: null,
+		currencyName: 'default',
+		countryName: 'Select Country'
+	}
+};
+
+export { API, COUNTRY_CODE, CLIENT, ERRORS, MINIMUM, MODE, COUNTRIES };

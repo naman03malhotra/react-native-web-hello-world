@@ -129,7 +129,7 @@ class Receive extends Component {
 							<TabContainer>
 								<ReceiveMain
 									{...all}
-									crypto="btc"
+									crypto="eth"
 									mode="crypto"
 									setSnackMsg={this._setSnackMsg}
 								/>

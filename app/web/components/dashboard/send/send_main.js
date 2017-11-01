@@ -145,7 +145,8 @@ class SendMain extends Component {
 		const data = {
 			amount,
 			to: address,
-			narration: descp
+			narration: descp,
+			crypto
 		};
 		const { error } = sendActions.validateData(
 			userData,
@@ -233,8 +234,8 @@ class SendMain extends Component {
 					<Typography type="subheading">Your Balance</Typography>
 					<Typography type="title" className={classes.title}>
 						{mode === 'fiat'
-							? userData.balanceFiat
-							: userData[crypto].balanceReal + userData[crypto].balanceVirtual}
+							? userData.balanceFiat.toFixed(2)
+							: userData[crypto].balance.toFixed(8)}
 					</Typography>
 					<Typography type="subheading">
 						{mode === 'fiat' ? fiat.toUpperCase() : crypto.toUpperCase()}

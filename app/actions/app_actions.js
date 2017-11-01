@@ -29,12 +29,12 @@ const appLoadActions = {
 				.then(res => {
 					Store.save({
 						key: 'userData',
-						data: res.body,
+						data: res.body.result,
 						expires: null
 					});
 					dispatch({
 						type: ACTION.APP.USER_LOAD,
-						data: res.body
+						data: res.body.result
 					});
 				})
 				.catch(err => {
@@ -47,19 +47,30 @@ const appLoadActions = {
 		};
 	},
 	loadRate: data => {
+		const newData = {
+			crypto: 'btc'
+		};
 		return dispatch => {
-			return APIManager.getData(API.currentBTCPrice, null, null).then(res => {
-				const rateData = {
-					btc: res.body.result
-				};
-				// Store.save({
-				// 	key: 'cryptoRate',
-				// 	data: rateData,
-				// 	expires: null
-				// });
-				dispatch({
-					type: ACTION.APP.LOAD_RATE,
-					data: rateData
+			return APIManager.getData(API.currentPrice, newData, null).then(res => {
+				newData.crypto = 'eth';
+				return APIManager.getData(
+					API.currentPrice,
+					newData,
+					null
+				).then(res1 => {
+					const rateData = {
+						btc: res.body.result,
+						eth: res1.body.result
+					};
+					Store.save({
+						key: 'cryptoRate',
+						data: rateData,
+						expires: null
+					});
+					dispatch({
+						type: ACTION.APP.LOAD_RATE,
+						data: rateData
+					});
 				});
 			});
 			// .catch(err => {

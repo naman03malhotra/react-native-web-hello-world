@@ -51,8 +51,10 @@ const signUpActions = {
 		const newData = {
 			error: null
 		};
-		if (data.mobile.length !== 10) {
+		if (data.mobile.length < 7) {
 			newData.error = ERRORS.SIGNUP.MOBILE_LENGTH;
+		} else if (data.countryCode == null) {
+			newData.error = ERRORS.SIGNUP.COUNTRY_NOT_PRESENT;
 		}
 		return {
 			type: ACTION.SIGNUP.SIGNUP_ACCOUNT_VALIDATION_ERR,
@@ -61,20 +63,20 @@ const signUpActions = {
 	},
 	signIn: data => {
 		const dataToSend = {
-			username: `${COUNTRY_CODE.ind.code}-${data.mobile}`,
-			password: data.password,
+			username: `${data.countryCode}-${data.mobile}`,
+			password: data.otp,
 			grant_type: CLIENT.grant_type,
 			client_id: CLIENT.client_id,
 			client_secret: CLIENT.client_secret
 		};
 		const mobileData = {
 			mobileNumber: data.mobile,
-			countryCode: COUNTRY_CODE.ind.code
+			countryCode: data.countryCode
 		};
 		return dispatch => {
 			return APIManager.postData(API.signin, dataToSend, null)
 				.then(res => {
-					if (res.body.access_token != '') {
+					if (res.body.access_token.length > 10) {
 						Store.save({
 							key: 'userAuth',
 							data: res.body,
@@ -91,24 +93,23 @@ const signUpActions = {
 						});
 					} else {
 						dispatch({
-							type: ACTION.SIGNUP.SIGNIN_ACCOUNT_ERR,
+							type: ACTION.SIGNUP.SIGNIN_ACCOUNT,
 							data: res.body
 						});
 					}
 				})
 				.catch(err => {
 					dispatch({
-						type: ACTION.APP.APP_ERROR,
+						type: ACTION.SIGNUP.SIGNIN_ACCOUNT,
 						data: err
 					});
 				});
 		};
 	},
-	mobileInput: data => {
+	mobileInput: (mobile, countryCode) => {
 		const dataToSend = {
-			mobile: data,
-			countryCode: COUNTRY_CODE.ind.code,
-			password: 'password'
+			mobile,
+			countryCode
 		};
 		return {
 			type: ACTION.SIGNUP.MOBILE_INPUT,

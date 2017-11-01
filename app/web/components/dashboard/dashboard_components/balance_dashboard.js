@@ -83,8 +83,6 @@ class BalanceDashboard extends Component {
 
 	render() {
 		const { classes, userData, cryptoRate, fiat } = this.props;
-		const totalBTC = (userData.btc.balanceReal + userData.btc.balanceVirtual
-		).toFixed(4);
 
 		return (
 			<Grid container spacing={24}>
@@ -112,10 +110,9 @@ class BalanceDashboard extends Component {
 									<ListItemText primary="Bitcoin" />
 									<ListItemSecondaryAction>
 										<ListItemText
-											primary={`${totalBTC} BTC`}
-											secondary={`${(totalBTC * cryptoRate.btc.sell).toFixed(
-												2
-											)} ${fiat.toUpperCase()}`}
+											primary={`${userData.btc.balance.toFixed(8)} BTC`}
+											secondary={`${userData.btc.balance *
+												cryptoRate.btc.sell} ${fiat.toUpperCase()}`}
 											className={classes.listSecondaryItem}
 										/>
 									</ListItemSecondaryAction>
@@ -131,8 +128,10 @@ class BalanceDashboard extends Component {
 									<ListItemSecondaryAction>
 										<ListItemText
 											className={classes.listSecondaryItem}
-											primary="0.0000 ETH"
-											secondary={`0.00 ${fiat.toUpperCase()}`}
+											primary={`${userData.eth.balance.toFixed(8)} ETH`}
+											secondary={`${userData.eth.balance *
+												cryptoRate.eth.sell} ${fiat.toUpperCase()}`}
+											className={classes.listSecondaryItem}
 										/>
 									</ListItemSecondaryAction>
 								</ListItem>
@@ -154,7 +153,10 @@ class BalanceDashboard extends Component {
 								</ListItem>
 								<Divider />
 								<ListItem>
-									<Typography type="caption" className={classes.listSecondaryItem}>
+									<Typography
+										type="caption"
+										className={classes.listSecondaryItem}
+									>
 										{`${(userData.balanceFiat / cryptoRate.btc.buy).toFixed(
 											2
 										)} BTC can be bought with your current balance`}

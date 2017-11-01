@@ -220,7 +220,7 @@ class Trade extends Component {
 							onChangeIndex={this._cryptoHandleChangeSwipe}
 						>
 							<TabContainer>{this._returnBTCGrid('btc')}</TabContainer>
-							<TabContainer>{this._returnBTCGrid('btc')}</TabContainer>
+							<TabContainer>{this._returnBTCGrid('eth')}</TabContainer>
 						</SwipeableViews>
 					</Grid>
 				)}

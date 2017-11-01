@@ -13,11 +13,19 @@ import Color from 'color';
 import Typography from 'material-ui/Typography';
 import ArrowForward from 'material-ui-icons/ArrowForward';
 import classNames from 'classnames';
-import assign from 'object-assign';
+import List, {
+	ListItem,
+	ListItemSecondaryAction,
+	ListItemText
+} from 'material-ui/List';
+import Avatar from 'material-ui/Avatar';
+import CountrySelect from './country_select';
 import Otp from './otp';
+
 import AppTheme from '../../../theme/variables';
 import SimpleAlert from '../../components/common/simple_alert';
 import Store from '../../../utils/storage';
+import { COUNTRIES } from '../../../configs/app_config';
 
 const styles = theme => ({
 	list: {
@@ -67,6 +75,10 @@ const styles = theme => ({
 	},
 	icon: {
 		marginLeft: AppTheme.spacingUnit
+	},
+	listItemCountry: {
+		marginTop: AppTheme.spacingUnit * 3,
+		marginBottom: AppTheme.spacingUnit * -2
 	}
 });
 
@@ -82,7 +94,9 @@ class SignupForm extends Component {
 		success: false,
 		error: null,
 		otpError: null,
-		isReady: false
+		isReady: false,
+		openCountry: false,
+		selectedCountry: 'default'
 	};
 	componentDidMount() {
 		const { signUpActions } = this.props;
@@ -103,24 +117,24 @@ class SignupForm extends Component {
 	};
 
 	_processSignin = () => {
-		const { signup, signUpActions } = this.props;
-		signUpActions.signIn(signup.signUpMobileInput).then(() => {
-			const { signup, signUpActions } = this.props;
-			if (signup.signInAccount.access_token != '') {
-				signUpActions.loadingOtp(false);
-				// this._sendFirebaseToken(signup.signInAccount.access_token);
-				window.location = '/dashboard';
-			}
-		});
+		// const { signup, signUpActions } = this.props;
+		// signUpActions.signIn(signup.signUpMobileInput, otp).then(() => {
+		// 	const { signup, signUpActions } = this.props;
+		// 	if (signup.signInAccount.access_token != null) {
+		// this._sendFirebaseToken(signup.signInAccount.access_token);
+		window.location = '/dashboard';
+		signUpActions.loadingOtp(false);
+		// 	}
+		// });
 	};
 	_enterDashboard = otp => {
 		const { signup, signUpActions } = this.props;
-		const dataToSend = assign({}, signup.signUpMobileInput, otp);
+		const dataToSend = Object.assign({}, signup.signUpMobileInput, otp);
 		if (!signup.signUpAccount.loadingOtp) {
 			signUpActions.loadingOtp(true);
-			signUpActions.signUp(dataToSend).then(() => {
-				const { signup, signUpAccount } = this.props.signup;
-				if (signUpAccount.status === 1) {
+			signUpActions.signIn(dataToSend).then(() => {
+				const { signup, signUpActions } = this.props;
+				if (signup.signInAccount.access_token !== null) {
 					this._processSignin();
 				} else {
 					signUpActions.loadingOtp(false);
@@ -134,6 +148,7 @@ class SignupForm extends Component {
 	_handleFormSubmit = event => {
 		event.preventDefault();
 		const { signup, signUpActions } = this.props;
+		const { selectedCountry } = this.state;
 
 		const { error } = signUpActions.validateData(signup.signUpMobileInput).data;
 		if (error !== null) {
@@ -164,10 +179,28 @@ class SignupForm extends Component {
 	_handleErrorRequestClose = () => {
 		this.setState({ error: null, otpError: null });
 	};
+	_toggleCountryOpen = () => {
+		this.setState({ openCountry: true });
+	};
+	_toggleCountryClose = selectedCountry => {
+		const { signup, signUpActions } = this.props;
+		signUpActions.mobileInput(
+			signup.signUpMobileInput.mobile,
+			COUNTRIES[selectedCountry].countryCode
+		);
+		this.setState({ selectedCountry, openCountry: false });
+	};
 	render() {
-		const { loading, error, otpError, isReady } = this.state;
+		const {
+			loading,
+			error,
+			otpError,
+			isReady,
+			openCountry,
+			selectedCountry
+		} = this.state;
 		const { classes, signUpActions, signup } = this.props;
-		// console.log(this.props);
+		console.log(this.props);
 		return (
 			<div>
 				{!isReady ? (
@@ -205,7 +238,23 @@ class SignupForm extends Component {
 										Please enter your Mobile Number to receive an OTP
 									</Typography>
 								</Paper>
-
+								<ListItem
+									button
+									className={classes.listItemCountry}
+									onClick={this._toggleCountryOpen}
+								>
+									<Avatar
+										alt={COUNTRIES[selectedCountry].countryName}
+										src={`/images/flags/${selectedCountry}.svg`}
+									/>
+									<ListItemText
+										primary={COUNTRIES[selectedCountry].countryName}
+									/>
+								</ListItem>
+								<CountrySelect
+									open={openCountry}
+									onRequestClose={this._toggleCountryClose}
+								/>
 								<form onSubmit={this._handleFormSubmit}>
 									<div className={classNames('form-group')}>
 										<div
@@ -223,7 +272,10 @@ class SignupForm extends Component {
 												)}
 												placeholder="Enter Mobile Number"
 												onChange={event =>
-													signUpActions.mobileInput(event.currentTarget.value)}
+													signUpActions.mobileInput(
+														event.currentTarget.value,
+														COUNTRIES[selectedCountry].countryCode
+													)}
 											/>
 										</div>
 									</div>
