@@ -30,6 +30,18 @@ const signUpActions = {
 				});
 		};
 	},
+	loadLocation: () => {
+		const newData = {};
+		return dispatch => {
+			return APIManager.getData(API.loadLocation, null, null).then(res => {
+				newData.currencyCode = res.body.geobytescurrencycode;
+				dispatch({
+					type: ACTION.SIGNUP.LOAD_LOCATION,
+					data: newData
+				});
+			});
+		};
+	},
 	signUp: data => {
 		return dispatch => {
 			return APIManager.postData(API.signup, data, null)

@@ -2,6 +2,7 @@ const serverIp = '54.169.5.21';
 // const serverIp = '54.169.109.31'; old srever ip
 
 const API = {
+	loadLocation: 'https://cors-anywhere.herokuapp.com/http://getcitydetails.geobytes.com/GetCityDetails',
 	signup: `http://${serverIp}/signup`,
 	signin: `http://${serverIp}/oauth2/token`,
 	fetchUser: `http://${serverIp}/api/userinfo`,

@@ -82,6 +82,11 @@ const styles = theme => ({
 	}
 });
 
+const codeMap = {
+	'+91': 'inr',
+	'+971': 'aed'
+};
+
 class SignupForm extends Component {
 	static propTypes = {
 		classes: PropTypes.object.isRequired,
@@ -102,13 +107,33 @@ class SignupForm extends Component {
 		const { signUpActions } = this.props;
 		signUpActions.authExistingToken().then(() => {
 			const { authStatus } = this.props.signup.signUpAccount;
-			if (authStatus === 1) window.location = '/dashboard';
-			else this.setState({ isReady: true });
+			if (authStatus === 1) {
+				window.location = '/dashboard';
+				return;
+			}
 			Store.load({
 				key: 'mobile'
-			}).then(mobileData => {
-				signUpActions.mobileInput(mobileData.mobileNumber);
-			});
+			})
+				.then(mobileData => {
+					signUpActions.mobileInput(
+						mobileData.mobileNumber,
+						mobileData.countryCode
+					);
+					this.setState({
+						selectedCountry: codeMap[mobileData.countryCode],
+						isReady: true
+					});
+				})
+				.catch(err => {
+					signUpActions.loadLocation().then(() => {
+						const { currencyCode } = this.props.signup.signUpAccount;
+						signUpActions.mobileInput('', currencyCode.toLowerCase());
+						this.setState({
+							selectedCountry: currencyCode.toLowerCase(),
+							isReady: true
+						});
+					});
+				});
 		});
 	}
 

@@ -3,11 +3,19 @@ import { combineReducers } from 'redux';
 import ACTION from '../constants/constants';
 
 const signUpAccount = (
-	state = { open: false, loadingOtp: false, error: null, authStatus: 0 },
+	state = {
+		open: false,
+		loadingOtp: false,
+		error: null,
+		authStatus: 0,
+		currencyCode: null
+	},
 	action
 ) => {
 	switch (action.type) {
 		case ACTION.SIGNUP.EXISTING_AUTH:
+			return Object.assign({}, state, action.data);
+		case ACTION.SIGNUP.LOAD_LOCATION:
 			return Object.assign({}, state, action.data);
 		case ACTION.SIGNUP.SIGNUP_ACCOUNT:
 			return Object.assign({}, state, action.data);
