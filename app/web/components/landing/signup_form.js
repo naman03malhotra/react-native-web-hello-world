@@ -127,11 +127,15 @@ class SignupForm extends Component {
 				.catch(err => {
 					signUpActions.loadLocation().then(() => {
 						const { currencyCode } = this.props.signup.signUpAccount;
-						signUpActions.mobileInput('', currencyCode.toLowerCase());
-						this.setState({
-							selectedCountry: currencyCode.toLowerCase(),
-							isReady: true
-						});
+						if (COUNTRIES[currencyCode.toLowerCase()] !== undefined) {
+							signUpActions.mobileInput('', currencyCode.toLowerCase());
+							this.setState({
+								selectedCountry: currencyCode.toLowerCase(),
+								isReady: true
+							});
+						} else {
+							this.setState({ isReady: true });
+						}
 					});
 				});
 		});

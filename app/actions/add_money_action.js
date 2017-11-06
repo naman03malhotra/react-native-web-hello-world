@@ -122,6 +122,7 @@ const addMoneyActions = {
 				dataToSend,
 				header
 			).then(res => {
+				newData.status = 2;
 				if (res.body.status === 1) {
 					newData.loading = false;
 					return sendPendingTransaction(dispatch, newData, header);
