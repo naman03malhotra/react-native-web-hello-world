@@ -1,4 +1,5 @@
-const serverIp = '54.169.5.21';
+// const serverIp = '54.169.5.21';
+const serverIp = '13.127.114.100:3000';
 // const serverIp = '54.169.109.31'; old srever ip
 
 const API = {

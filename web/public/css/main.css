@@ -953,7 +953,7 @@ nprogress - css
 	max-width: 50px;
 	max-height: 50px;
 }
-.featurebox .featuretext {
+.featurebox .featuretext
 .featurebox .numberlabel {
 	margin-top: 0px;
 	padding-bottom: 10px;
@@ -962,6 +962,10 @@ nprogress - css
 	letter-spacing: 0.1em;
 	font-weight: 700;
 	font-size: 15px;
+}
+.fa-money {
+	font-size: 47px;
+	color: #3e79ba;
 }
 .featurebox .fa{
 	font-size: 50px;
